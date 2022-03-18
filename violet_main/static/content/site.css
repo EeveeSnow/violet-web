@@ -1,0 +1,122 @@
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+:root {
+    --main_color: midnightblue;
+    --second_color: #b3b3cd;
+    --support_color: orange;
+    --cloud_color: #707070;
+    --sun_color: #b3b3cd;
+    --sun_color__active: whitesmoke;
+    --sky_color: midnightblue;
+}
+
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+    background-color: var(--main_color);
+    margin: 0px;
+    color: var(--second_color);
+    font-family: 'segoe ui';
+}
+
+.sun {
+    position: absolute;
+    left: 50%;
+    margin-left: -135px;
+    background-color: var(--main_color)
+}
+
+.sun__about {
+    text-align: center;
+    color: var(--second_color);
+    background-color: var(--main_color);
+    font-family: 'segoe ui';
+}
+
+/* SVG */
+svg {
+    /* cursor: pointer; */
+    fill: var(--main_color)
+}
+
+#sky {
+    fill: var(--sky_color)
+}
+
+#Ellipse_1, #Ellipse_2, #Ellipse_3, #Ellipse_4, #Rectangle_1 {
+    fill: var(--cloud_color)
+}
+
+#Ellipse_1_2, #Ellipse_2_2, #Ellipse_3_2, #Ellipse_4_2, #Rectangle_1_2 {
+    fill: var(--cloud_color)
+}
+
+#light1, #light2, #dark1, #sun, #sky, .sun, .sun__about, body {
+    transition: all 1s ease;
+}
+
+#sun {
+    cursor: pointer;
+    fill: var(--sun_color)
+}
+
+#dark1 {
+    opacity: 0;
+}
+
+svg:hover #light1 {
+    transform: translateX(-10%);
+}
+
+svg:hover #light2 {
+    transform: translateX(10%);
+}
+
+svg:hover #sun {
+    fill: var(--sun_color__active)
+}
+
+svg:hover #dark1 {
+    transform: translateY(-100%);
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* styles for validation helpers */
+.field-validation-error {
+    color: #b94a48;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-errors {
+    color: #b94a48;
+}
+
+.validation-summary-valid {
+    display: none;
+}

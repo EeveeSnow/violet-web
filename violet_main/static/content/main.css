@@ -1,0 +1,54 @@
+:root {
+    --main-color-primary: midnightblue;
+    --main-color-secondary: DarkBlue;
+    --second_color: whitesmoke;
+    --support_color: #098fc4;
+    font-size: 16px;
+    --text-primary: #b6b6b6;
+    --text-secondary: #ececec;
+    --transition-speed: 600ms;
+}
+
+main {
+    display: grid;
+    grid-template-areas: "header header header" "navbar content sidebar";
+
+    margin-top: -8px;
+
+    grid-template-columns: 1fr 3fr 1fr;
+
+    grid-template-rows: 16px auto;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+body {
+    background: var(--main-color-primary);
+    color: var(--text-primary)
+}
+
+body::-webkit-scrollbar {
+    width: 0.25rem;
+}
+
+body::-webkit-scrollbar-track {
+    background: #1e1e24;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #6649b8;
+}
+
+login_form{
+    grid-area: content;
+}
+
+header{
+    width: 100%;
+    height: 16px;
+    grid-area: header;
+    left: 0px;
+    background-color: var(--support_color);
+}

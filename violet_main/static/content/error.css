@@ -1,0 +1,34 @@
+body {
+    background: midnightblue;
+}
+.error__number {
+    color: red;
+    left: 50%;
+    text-align: center;
+    font-size: 4000%;
+    font-family: 'Pacifico', cursive;
+}
+
+.error__number::selection{
+    color: none;
+}
+
+.error_mesage {
+    color: honeydew;
+    left: 50%;
+    text-align: center;
+    font-size: 400%
+}
+
+h2 {
+    color: orangered;
+}
+
+p {
+    color: ghostwhite;
+    White-space: pre-line;
+}
+
+ins{
+    color: wheat;
+}
