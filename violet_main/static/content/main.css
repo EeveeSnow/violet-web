@@ -41,7 +41,7 @@ body::-webkit-scrollbar-thumb {
     background: #6649b8;
 }
 
-login_form{
+login_form, register_form, news_form {
     grid-area: content;
 }
 

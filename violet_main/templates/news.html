@@ -1,0 +1,30 @@
+{% extends "min-layout.html" %}
+
+{% block content %}
+<news_form>
+<h1>Добавление новости</h1>
+<form action="" method="post", enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.content.label }}<br>
+        {{ form.content(class="form-control") }}<br>
+        {% for error in form.content.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ image_form.image }} {{ image_form.image.label }}
+        {% for error in image_form.image.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>{{ form.is_private() }} {{ form.is_private.label }}</p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
+</form>
+</news_form>
+{% endblock %}

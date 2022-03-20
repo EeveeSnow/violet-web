@@ -1,0 +1,1 @@
+npx @squoosh/cli --webp auto violet_main/static/files/pbkdf2sha256150000TkLcUp2Qa67bdad8101df503f6d26cb4055ea6c262ab1011e618b0131dda8b4606ad4bd1.jpeg --output-dir violet_main/static/files/webp

@@ -3,19 +3,28 @@ Routes and views for the flask application.
 """
 
 from datetime import datetime
-from flask import Flask, make_response, redirect, render_template, request, session
+import os
+import hashlib
+from types import NoneType
+from flask import Flask, make_response, redirect, render_template, session
 from werkzeug.exceptions import HTTPException
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
 from violet_main import app
+from violet_main.data.news import News
 from violet_main.data.users import User
 from violet_main.data import db_session
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from violet_main.forms.NewsForm import NewsForm
+from violet_main.forms.PhotoForm import UploadForm
 from violet_main.forms.RegisterForm import RegisterForm
 from violet_main.forms.LoginForm import LoginForm
 
 
-db_session.global_init("violet_main/db/IDE.db")
+db_session.global_init("violet_main/db/data.db")
 login_manager = LoginManager()
 login_manager.init_app(app)
+UPLOAD_PATH = "server/images"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -31,8 +40,10 @@ def home():
         param["user"] = current_user.user
     else:
         param["user"] = "Войдите в аккаунт"
+    db_sess = db_session.create_session()
+    news = db_sess.query(News).filter(News.is_private != True)
     return render_template(
-        'index.html', param=param
+        'index.html', param=param, news=news
         )
 
 @app.route('/profile')
@@ -136,3 +147,31 @@ def login():
 def logout():
     logout_user()
     return redirect("/")
+
+@app.route('/add_news',  methods=['GET', 'POST'])
+@login_required
+def add_news():
+    form = NewsForm()
+    form2 = UploadForm()
+    filename = None
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        news = News()
+        if form2.image.data != None:
+            file = form2.image.data
+            filename = datetime.now().strftime("%m_%d_%Y_%H_%M_%S") + file.filename
+            filename = secure_filename(filename).split(".")
+            filename = generate_password_hash(filename[0]) + "." + filename[1]
+            filename = secure_filename(filename)
+            file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+            app.config['UPLOAD_FOLDER'],filename))
+            news.images = filename
+        news.content = form.content.data
+        news.is_private = form.is_private.data
+        news.images = filename
+        current_user.news.append(news)
+        db_sess.merge(current_user)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('news.html', 
+                           form=form, image_form=form2)

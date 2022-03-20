@@ -1,2 +1,2 @@
 from . import users
-from . import addons
+from . import news
