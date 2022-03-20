@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 
 {% block user %}
+{% if current_user.is_authenticated %}
 <span class="link-text username-text">{{param.user}}</span>
+{% else %}
+<span class="link-text nousername-text">{{param.user}}</span>
+{% endif %}
 {% endblock %}
 
 {% block content %}

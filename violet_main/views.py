@@ -30,7 +30,7 @@ def home():
     if current_user.is_authenticated:
         param["user"] = current_user.user
     else:
-        param["user"] = None
+        param["user"] = "Войдите в аккаунт"
     return render_template(
         'index.html', param=param
         )

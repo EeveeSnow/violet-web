@@ -31,9 +31,17 @@
             <a class="btn-logout" href="/logout">Выйти </a>
         </div>
             {% else %}
+            <div class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   Авторизация
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                  <a class="dropdown-item" href="/register">Зарегистрироваться</a>
+                  <a class="dropdown-item" href="/login">Войти</a>
+                </div>
+              </div>
             <p>
-                <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
-                <a class="btn btn-success" href="/login">Войти</a>
+
             </p>
             {% endif %}
         </header>
