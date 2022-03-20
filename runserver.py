@@ -10,6 +10,8 @@ from violet_main import app
 if __name__ == '__main__':
     HOST = environ.get('SERVER_HOST', 'localhost')
     PORT = randint(1000, 9999)
+    FLASK_ENV = "development"
     app.run(HOST, PORT, debug=True)
         
 
+   

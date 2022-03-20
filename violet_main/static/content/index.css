@@ -49,11 +49,26 @@ body::-webkit-scrollbar-thumb {
 }
 
 header{
-    width: 100%;
-    height: 16px;
+    width: 200%;
+    height: 20px;
     grid-area: header;
     left: 0px;
     background-color: var(--support_color);
+}
+
+header .btn-logout {
+    margin-left: 95%;
+    text-decoration: none;
+    color: var(--text-primary);
+    position:absolute;
+    top:0;
+    left: 1.5rem;
+}
+
+header svg {
+    margin-left: 95%;
+    position:absolute;
+    top:0;
 }
 
 .navbar {

@@ -27,7 +27,10 @@ def load_user(user_id):
 def home():
     """Renders the home page."""
     param = {}
-    param["user"] = current_user.username
+    if current_user.is_authenticated:
+        param["user"] = current_user.user
+    else:
+        param["user"] = None
     return render_template(
         'index.html', param=param
         )
@@ -91,7 +94,6 @@ def main():
     else:
         return redirect('/login')
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
     form = RegisterForm()
@@ -106,7 +108,7 @@ def reqister():
                                    form=form,
                                    message="Whoops we already have some one with this name(")
         user = User(
-            username=form.name.data,
+            user=form.name.data,
             email=form.email.data,
         )
         user.set_password(form.password.data)
@@ -128,3 +130,9 @@ def login():
                                message="Wrong login or password",
                                form=form)
     return render_template('login.html', title='Autorisation', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
