@@ -5,6 +5,7 @@ Routes and views for the flask application.
 from datetime import datetime
 import os
 import hashlib
+import subprocess
 from types import NoneType
 from flask import Flask, make_response, redirect, render_template, session
 from werkzeug.exceptions import HTTPException
@@ -46,12 +47,9 @@ def home():
         'index.html', param=param, news=news
         )
 
-@app.route('/profile')
+@app.route('/user_id:<int:id>')
 def profile():
-    if current_user.is_authenticated:
-        return render_template('profile.html')
-    else:
-        return redirect('/login')
+    return render_template('profile.html')
 
 
 
@@ -161,14 +159,21 @@ def add_news():
             file = form2.image.data
             filename = datetime.now().strftime("%m_%d_%Y_%H_%M_%S") + file.filename
             filename = secure_filename(filename).split(".")
-            filename = generate_password_hash(filename[0]) + "." + filename[1]
+            filename_raw = generate_password_hash(filename[0])
+            filename = filename_raw + "." + filename[1]
             filename = secure_filename(filename)
             file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),
             app.config['UPLOAD_FOLDER'],filename))
+            command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
+                 filename + " --output-dir violet_main/static/files/webp"
+            print(command)
+            subprocess.call(command, shell = True)
+            filename = filename_raw + ".webp"
+            filename = secure_filename(filename)
+            filename = "webp/" + filename
             news.images = filename
         news.content = form.content.data
         news.is_private = form.is_private.data
-        news.images = filename
         current_user.news.append(news)
         db_sess.merge(current_user)
         db_sess.commit()

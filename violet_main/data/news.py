@@ -23,4 +23,8 @@ class News(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, 
                                 sqlalchemy.ForeignKey("users.id"))
 
+    spotify = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
+
+    youtube = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+
     user = orm.relation('User')

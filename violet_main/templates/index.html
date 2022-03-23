@@ -17,18 +17,21 @@
     {% endif %}
     {% for item in news%}
     <div class="news-box">
+        <div class="news-box-content">
     <div class="news-box-author">
-        Автор - {{item.user.name}}
+        Автор - <a href="/user_id:{{item.user.id}}"> {{ item.user.user }} </a>
     </div>
-    <div class="news-box-content">
+    <p class="news-box-text">
     {{item.content}}
-    </div>
+    </p>
     {% if item.images != None %}
-    <p>{{item.images}}</p>
-    <img class="news-box-img" alt="news-img" src="static/files/{{item.images}}">
+    <!-- <div class="news-box-img" style="background-image: url(static/files/{{item.images}});"> -->
+    <source class="news-box-img" srcset="static/files/webp/{{item.images}}">
+        <img class="news-box-img" alt="news-img" src="static/files/{{item.images}}"> 
     {% endif %}
-    <div class="news-box-date">
-        Дата написания - {{item.created_date}}
+    <p class="news-box-text">
+        <small class="text-muted">Дата написания - {{item.created_date}}</small>
+    </p>
     </div>
     </div>
 
