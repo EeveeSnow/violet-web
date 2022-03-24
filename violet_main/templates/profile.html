@@ -15,10 +15,28 @@
 
 {% block content %}
 
+<div class="profile-template">
+<div class="profile-box">
+    {% for item in profile %}
+    {% if item.image != None %}
+        <img class="profile-img" alt="profile-image" src="static/files/{{item.image}}">
+    {% else %}
+        <img class="profile-img" alt="profile-image" src="static/images/person_default.png">
+    {% endif %}
+    <h2 class="name">{{item.user}}</h2>
+    {% endfor %}
+    {% if not profile_exs %}
+    <h1 class="user_not_exist"> Такого пользователя не существует </h1>
+    {% endif %}
+</div>
+</div>
+
 <div class="news-template">
     <div class="news-content">
     {% if current_user.is_authenticated %}
-    <a href="add_news" class="btn btn-secondary">Добавить новость</a>
+        {% if param.now_id == param.id %}
+        <a href="/add_news" class="btn btn-secondary">Добавить новость</a>
+        {% endif %}
     {% endif %}
     {% for item in news%}
     <div class="news-box">

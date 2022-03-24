@@ -39,17 +39,36 @@ def home():
     param = {}
     if current_user.is_authenticated:
         param["user"] = current_user.user
+        param["image"] = current_user.image
     else:
         param["user"] = "Войдите в аккаунт"
+        param["image"] = None
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.is_private != True)
+    news = db_sess.query(News).filter(News.is_private != True) 
     return render_template(
         'index.html', param=param, news=news
         )
 
-@app.route('/user_id:<int:id>')
-def profile():
-    return render_template('profile.html')
+@app.route('/user_id:<int:user_id>')
+def profile(user_id):
+    param = {}
+    if current_user.is_authenticated:
+        param["user"] = current_user.user
+        param["image"] = current_user.image
+        param["now_id"] = current_user.id
+    else:
+        param["user"] = "Войдите в аккаунт"
+        param["image"] = None
+        param["now_id"] = ""
+    param["id"] = user_id
+    db_sess = db_session.create_session()
+    if param["now_id"] == param["id"]:
+        news = db_sess.query(News).filter(News.user_id == user_id) 
+    else:
+        news = db_sess.query(News).filter(News.user_id == user_id).filter(News.is_private != True) 
+    profile_inf = db_sess.query(User).filter(User.id == user_id)
+    exist = profile_inf.first() is not None
+    return render_template('profile.html', param=param, news=news, profile=profile_inf, profile_exs=exist)
 
 
 
