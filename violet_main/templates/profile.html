@@ -19,9 +19,11 @@
 <div class="profile-box">
     {% for item in profile %}
     {% if item.image != None %}
+    <a href="/image:{{item.image.split('/')[1]}}:{{param.now_id}}">
         <img class="profile-img" alt="profile-image" src="static/files/{{item.image}}">
-    {% else %}
-        <img class="profile-img" alt="profile-image" src="static/images/person_default.png">
+    </a>   
+    {% else %} 
+    <img class="profile-img" alt="profile-image" src="static/images/person_default.png">
     {% endif %}
     <h2 class="name">{{item.user}}</h2>
     {% endfor %}
@@ -49,8 +51,10 @@
     </p>
     {% if item.images != None %}
     <!-- <div class="news-box-img" style="background-image: url(static/files/{{item.images}});"> -->
-    <source class="news-box-img" srcset="static/files/webp/{{item.images}}">
-        <img class="news-box-img" alt="news-img" src="static/files/{{item.images}}"> 
+    <!-- <source class="news-box-img" srcset="static/files/webp/{{item.images}}"> -->
+    <a href="/image:{{item.images.split('/')[1]}}:{{item.user.id}}">
+        <img class="news-box-img" alt="news-img" src="static/files/{{item.images}}">
+    </a>
     {% endif %}
     <p class="news-box-text">
         <small class="text-muted">Дата написания - {{item.created_date}}</small>

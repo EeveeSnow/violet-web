@@ -70,6 +70,9 @@ def profile(user_id):
     exist = profile_inf.first() is not None
     return render_template('profile.html', param=param, news=news, profile=profile_inf, profile_exs=exist)
 
+@app.route('/image:<path:image_uri>:<int:code>')
+def image(image_uri, code):
+    return render_template('image.html', image_uri=image_uri)
 
 
 @app.route('/contact')
@@ -191,7 +194,27 @@ def add_news():
             filename = secure_filename(filename)
             filename = "webp/" + filename
             news.images = filename
-        news.content = form.content.data
+        news_text = form.content.data
+        news_text_parced = news_text.split()
+        if "https://open.spotify.com/" in news_text:
+            news_text_parced = news_text.split("https://open.spotify.com/")
+            try:
+                news_track_id = list(filter(lambda x: "track/" in x, news_text_parced))[0]\
+                    .split("track/")[1].split()[0].split("?")[0]
+                has_track = True
+            except IndexError:
+                has_track = False
+            try:
+                news_playlist_id = list(filter(lambda x: "playlist/" in x, news_text_parced))[0]\
+                    .split("playlist/")[1].split()[0].split("?")[0]
+                has_playlist = True
+            except IndexError:
+                has_playlist = False
+            if has_track:
+                news.spotify_track = news_track_id
+            if has_playlist:
+                news.spotify_playlist = news_playlist_id
+        news.content = news_text
         news.is_private = form.is_private.data
         current_user.news.append(news)
         db_sess.merge(current_user)

@@ -47,7 +47,10 @@ body::-webkit-scrollbar-thumb {
 }
 
 .container {
+    height: calc(100vh - 2.5rem) !important;
+
     grid-area: content;
+
     transition: 600ms ease;
 
     height: 100%;
@@ -135,6 +138,7 @@ body::-webkit-scrollbar-thumb {
     -ms-flex-direction: column;
     flex-direction: column;
     min-width: 0;
+    overflow: scroll;
     word-wrap: break-word;
     background-color: var(--main-color-primary);
     background-clip: border-box;
@@ -163,6 +167,11 @@ body::-webkit-scrollbar-thumb {
     max-height: calc(calc(100% - 4em) / 16 * 9);
     display: block;
     margin: 0 auto;
+}
+
+iframe {
+    margin: 0 auto;
+    display: block;
 }
 /* header */
 
