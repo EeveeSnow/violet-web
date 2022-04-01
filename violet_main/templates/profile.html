@@ -36,25 +36,34 @@
 <div class="news-template">
     <div class="news-content">
     {% if current_user.is_authenticated %}
-        {% if param.now_id == param.id %}
-        <a href="/add_news" class="btn btn-secondary">Добавить новость</a>
-        {% endif %}
+    <a href="add_news" class="btn btn-secondary">Добавить новость</a>
     {% endif %}
     {% for item in news%}
     <div class="news-box">
         <div class="news-box-content">
-    <div class="news-box-author">
-        Автор - <a href="/user_id:{{item.user.id}}"> {{ item.user.user }} </a>
-    </div>
     <p class="news-box-text">
     {{item.content}}
     </p>
+    {% if item.spotify_playlist != None %}
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/{{ item.spotify_playlist }}?utm_source=generator" width="90%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    <br>
+    {% endif %}
+    {% if item.spotify_album != None %}
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/{{ item.spotify_album }}?utm_source=generator" width="90%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    <br>
+    {% endif %}
+    {% if item.spotify_track != None %}
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/{{ item.spotify_track }}?utm_source=generator" width="90%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    <br>
+    {% endif %}
     {% if item.images != None %}
-    <!-- <div class="news-box-img" style="background-image: url(static/files/{{item.images}});"> -->
-    <!-- <source class="news-box-img" srcset="static/files/webp/{{item.images}}"> -->
     <a href="/image:{{item.images.split('/')[1]}}:{{item.user.id}}">
         <img class="news-box-img" alt="news-img" src="static/files/{{item.images}}">
     </a>
+    <br>
+    {% endif %}
+    {% if item.youtube_video != None %}
+    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/{{ item.youtube_video }}?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     {% endif %}
     <p class="news-box-text">
         <small class="text-muted">Дата написания - {{item.created_date}}</small>

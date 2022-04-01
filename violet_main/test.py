@@ -19,7 +19,10 @@ if "https://open.spotify.com/" in news_text:
         print(news_playlist_id)
 if "https://youtu.be/" in news_text:
     news_text_parced = news_text.split("https://youtu")
-    youtube_id = list(filter(lambda x: ".be/" in x, news_text_parced))[0].split(".be/")[1].split()[0]
-    has_youtube = True
+    try:
+        youtube_id = list(filter(lambda x: ".be/" in x, news_text_parced))[0].split(".be/")[1].split()[0]
+        has_youtube = True
+    except IndexError:
+        has_youtube = False
     print(youtube_id)
 

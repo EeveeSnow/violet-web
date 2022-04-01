@@ -2,30 +2,39 @@
 Routes and views for the flask application.
 """
 
-from datetime import datetime
-import os
+from hashlib import md5
 import hashlib
+import random
+import secrets
+import string
+import os
 import subprocess
-from types import NoneType
+from datetime import datetime
+
 from flask import Flask, make_response, redirect, render_template, session
+from flask_login import (LoginManager, current_user, login_required,
+                         login_user, logout_user)
+from requests import post
 from werkzeug.exceptions import HTTPException
-from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
-from violet_main import app
+from werkzeug.utils import secure_filename
+
+from violet_main import Violet_API, app
+from violet_main.data import db_session
 from violet_main.data.news import News
 from violet_main.data.users import User
-from violet_main.data import db_session
-from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from violet_main.forms.LoginForm import LoginForm
 from violet_main.forms.NewsForm import NewsForm
 from violet_main.forms.PhotoForm import UploadForm
 from violet_main.forms.RegisterForm import RegisterForm
-from violet_main.forms.LoginForm import LoginForm
 
 
 db_session.global_init("violet_main/db/data.db")
 login_manager = LoginManager()
 login_manager.init_app(app)
 UPLOAD_PATH = "server/images"
+app.register_blueprint(Violet_API.api_route)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -175,8 +184,6 @@ def add_news():
     form2 = UploadForm()
     filename = None
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        news = News()
         if form2.image.data != None:
             file = form2.image.data
             filename = datetime.now().strftime("%m_%d_%Y_%H_%M_%S") + file.filename
@@ -193,49 +200,45 @@ def add_news():
             filename = filename_raw + ".webp"
             filename = secure_filename(filename)
             filename = "webp/" + filename
-            news.images = filename
-        news_text = form.content.data
-        news_text_parced = news_text.split()
-        if "https://open.spotify.com/" in news_text:
-            news_text_parced = news_text.split("https://open.spotify.com/")
-            try:
-                news_track_id = list(filter(lambda x: "track/" in x, news_text_parced))[0]\
-                    .split("track/")[1].split()[0].split("?")[0]
-                has_track = True
-            except IndexError:
-                has_track = False
-            try:
-                news_playlist_id = list(filter(lambda x: "playlist/" in x, news_text_parced))[0]\
-                    .split("playlist/")[1].split()[0].split("?")[0]
-                has_playlist = True
-            except IndexError:
-                has_playlist = False
-            try:
-                news_album_id = list(filter(lambda x: "album/" in x, news_text_parced))[0]\
-                    .split("album/")[1].split()[0].split("?")[0]
-                has_album = True
-            except IndexError:
-                has_album = False
-            if has_track:
-                news.spotify_track = news_track_id
-            if has_playlist:
-                news.spotify_playlist = news_playlist_id
-            if has_album:
-                news.spotify_album = news_album_id
-        if "https://youtu.be/" in news_text:
-            news_text_parced = news_text.split("https://youtu")
-            try:
-                news_youtube_id = list(filter(lambda x: ".be/" in x, news_text_parced))[0].split(".be/")[1].split()[0]
-                has_youtube = True
-            except IndexError:
-                has_youtube = False
-            if has_youtube:
-                news.youtube_video = news_youtube_id
-        news.content = news_text
-        news.is_private = form.is_private.data
-        current_user.news.append(news)
-        db_sess.merge(current_user)
-        db_sess.commit()
+        server = "http://localhost:5000"
+        print(post(f'{server}/api/news',
+           json={'api_key': "XYGD6dX+$Zi1Tw2z",
+                 'content': form.content.data,
+                 'user_id': current_user.id,
+                 'images': filename,
+                 'is_private': form.is_private.data}).json())
         return redirect('/')
     return render_template('news.html', 
                            form=form, image_form=form2)
+
+@app.route('/api-bot-register', methods=['GET', 'POST'])
+def bot_register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
+            return render_template('register.html', title='Registration',
+                                   form=form,
+                                   message="Passwords not the same")
+        db_sess = db_session.create_session()
+        if db_sess.query(User).filter(User.email == form.email.data).first():
+            return render_template('register.html', title='Registration',
+                                   form=form,
+                                   message="Whoops we already have some one with this mail(")
+        key_search = True
+        while key_search:
+            letters_and_digits = string.ascii_letters + string.digits
+            rand_string = ''.join(random.sample(letters_and_digits, 16))
+            key = hashlib.sha1(rand_string.encode('utf-8')).hexdigest()
+            if db_sess.query(User).filter(User.bot_id == key).first() is None:
+                key_search = False
+        user = User(
+            user=form.name.data,
+            email=form.email.data,
+            is_bot=True,
+            bot_id=key
+        )
+        user.set_password(form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('api.html', title='Registration', form=form)
