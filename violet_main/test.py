@@ -1,4 +1,4 @@
-news_text = " Lisen my new track https://open.spotify.com/playlist/1ZsZaVYB0rWgMJ7yArtuYb?si=0bcb5d5fac884579 on spotify! here is a link: "
+news_text = "Lisen my new track  on spotify! here is a link: https://youtu.be/Pnp_7IaqW74"
 news_text_parced = news_text.split()
 if "https://open.spotify.com/" in news_text:
     news_text_parced = news_text.split("https://open.spotify.com/")
@@ -17,3 +17,9 @@ if "https://open.spotify.com/" in news_text:
         print(news_track_id)
     if has_playlist:
         print(news_playlist_id)
+if "https://youtu.be/" in news_text:
+    news_text_parced = news_text.split("https://youtu")
+    youtube_id = list(filter(lambda x: ".be/" in x, news_text_parced))[0].split(".be/")[1].split()[0]
+    has_youtube = True
+    print(youtube_id)
+

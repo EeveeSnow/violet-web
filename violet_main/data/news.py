@@ -25,7 +25,9 @@ class News(SqlAlchemyBase):
 
     spotify_track = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
 
-    spotify_playlist = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
+    spotify_playlist = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+
+    spotify_album = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
 
     youtube_video = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 

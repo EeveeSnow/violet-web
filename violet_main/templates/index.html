@@ -33,6 +33,10 @@
     <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/{{ item.spotify_playlist }}?utm_source=generator" width="90%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
     <br>
     {% endif %}
+    {% if item.spotify_album != None %}
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/album/{{ item.spotify_album }}?utm_source=generator" width="90%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    <br>
+    {% endif %}
     {% if item.spotify_track != None %}
     <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/{{ item.spotify_track }}?utm_source=generator" width="90%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
     <br>
@@ -42,6 +46,10 @@
     <a href="/image:{{item.images.split('/')[1]}}:{{item.user.id}}">
         <img class="news-box-img" alt="news-img" src="static/files/{{item.images}}">
     </a>
+    <br>
+    {% endif %}
+    {% if item.youtube_video != None %}
+    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/{{ item.youtube_video }}?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     {% endif %}
     <p class="news-box-text">
         <small class="text-muted">Дата написания - {{item.created_date}}</small>
