@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - My Flask Application</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="/static/content/main.css" />
+    <link rel="stylesheet" type="text/css" href="/static/content/MediumOrchid.css" />
+    <link rel="stylesheet" type="text/css" href="/static/content/dark.css" />
+
+    <script src="/static/scripts/modernizr-2.6.2.js"></script>
+</head>
+
+<body>
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <!-- <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg> -->
+            <span class="fs-4">Мастерская API</span>
+        </a>
+        <hr>
+        <ul class="list-unstyled ps-0">
+            <li class="nav-item">
+              <a href="#" class="nav-link active" aria-current="page">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+                Главная
+              </a>
+            </li>
+            <li>
+              <a href="#" class="nav-link text-white">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                Настройки бота
+              </a>
+            </li>
+            <li class="mb-1 nav-item">
+                <button class=" btn btn-toggle align-items-center text-white rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
+                  Документация
+                </button>
+                <div class="collapse show" id="home-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li><a href="/doc:image_API" class="link-dark text-white rounded">Image API</a></li>
+                    <li><a href="/doc:news_API" class="link-dark text-white rounded">News API</a></li>
+                  </ul>
+                </div>
+              </li>
+          </ul>
+
+
+    
+    </div>
+    <main>
+        <header></header>
+        {% block content %}
+
+        {% endblock %}
+    </main>
+    <footer class="py-3 my-4">
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+            <li class="nav-item">
+                <a href="/" class="nav-link px-2 text-muted"> Главная </a>
+            </li>
+            <li class="nav-item">
+                <a href="/about" class="nav-link px-2 text-muted"> О нас </a>
+            </li>
+            <li class="nav-item">
+                <a href="/for_devs" class="nav-link px-2 text-muted"> Для разработчиков </a>
+            </li>
+        </ul>
+        <p class="text-center text-muted"> © 2022 Violet Web </p>
+    </footer>
+</body>

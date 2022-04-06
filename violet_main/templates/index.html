@@ -24,7 +24,14 @@
     <div class="news-box">
         <div class="news-box-content">
     <div class="news-box-author">
-        Автор - <a href="/user_id:{{item.user.id}}"> {{ item.user.user }} </a>
+        <a href="/user_id:{{item.user.id}}">
+           {% if item.user.image != None %}
+            <img class="news-box-author-img" alt="profile-image" src="static/files/{{item.user.image}}">
+            {% else %}
+            <img class="news-box-author-img" alt="profile-image" src="static/images/person_default.png">
+            {% endif %}
+            <news-box-author-name>{{ item.user.user }}</news-box-author-name>
+        </a>
     </div>
     <p class="news-box-text">
     {{item.content}}
@@ -51,8 +58,8 @@
     {% if item.youtube_video != None %}
     <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/{{ item.youtube_video }}?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     {% endif %}
-    <p class="news-box-text">
-        <small class="text-muted">Дата написания - {{item.created_date}}</small>
+    <p class="news-box-text-date">
+        <small class="text-muted">Дата написания - {{item.created_date.strftime('%Y %b %d %I:%M %p')}}</small>
     </p>
     </div>
     </div>

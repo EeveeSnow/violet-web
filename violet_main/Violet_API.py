@@ -1,6 +1,12 @@
+import base64
+from datetime import datetime
+import io
+import os
+import subprocess
 import flask
 from flask import jsonify, request
-
+from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
 from violet_main.data import db_session
 from violet_main.data.news import News
 from violet_main.data.users import User
@@ -14,14 +20,13 @@ api_route = flask.Blueprint(
 
 @api_route.route('/api/news', methods=['POST'])
 def create_news():
-
+    db_sess = db_session.create_session()
     if not request.json:
         return jsonify({'error': 'Empty request'})
     elif not all(key in request.json for key in
                  ["api_key", 'content', 'user_id', 'images', 'is_private']):
         return jsonify({'error': 'Bad request'})
-    db_sess = db_session.create_session()
-    if db_sess.query(User).filter(User.bot_id == request.json['api_key']).first() is not None or\
+    elif db_sess.query(User).filter(User.bot_id == request.json['api_key']).first() is not None or\
         request.json['api_key'] != app_api:
         return jsonify({'error': 'wrong api key'})
     news_text = request.json['content']
@@ -70,3 +75,37 @@ def create_news():
     db_sess.add(news)
     db_sess.commit()
     return jsonify({'success': 'OK'})
+
+@api_route.route('/api/images', methods=['GET', 'POST'])
+def post_image():
+    db_sess = db_session.create_session()
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ["api_key", 'image_name', 'image_bin']):
+        return jsonify({'error': 'Bad request'})
+    elif db_sess.query(User).filter(User.bot_id == request.json['api_key']).first() is not None or\
+        request.json['api_key'] != app_api:
+        return jsonify({'error': 'wrong api key'})
+    filename = datetime.now().strftime("%m_%d_%Y_%H_%M_%S") + request.json['image_name']
+    filename = secure_filename(filename).split(".")
+    filename_raw = generate_password_hash(filename[0])
+    filename = filename_raw + "." + filename[1]
+    filename = secure_filename(filename)
+    with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+        "static/files", filename), "wb") as file:
+        file.write(base64.b64decode(request.json['image_bin'].encode('utf-8')))
+    command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
+                 filename + " --output-dir violet_main/static/files/webp"
+    subprocess.call(command, shell = True)
+    os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+        "static/files", filename))
+    filename = filename_raw + ".webp"
+    filename = secure_filename(filename)
+    filename = "webp/" + filename
+    return jsonify(
+        {
+            'file_name': filename
+        }
+    )
+    

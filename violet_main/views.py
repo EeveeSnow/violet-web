@@ -83,6 +83,10 @@ def profile(user_id):
 def image(image_uri, code):
     return render_template('image.html', image_uri=image_uri)
 
+@app.route('/for_devs')
+def dev():
+    return render_template("dev_page_layout.html")
+
 
 @app.route('/contact')
 def contact():
@@ -195,8 +199,9 @@ def add_news():
             app.config['UPLOAD_FOLDER'],filename))
             command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
                  filename + " --output-dir violet_main/static/files/webp"
-            print(command)
             subprocess.call(command, shell = True)
+            os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+            app.config['UPLOAD_FOLDER'],filename))
             filename = filename_raw + ".webp"
             filename = secure_filename(filename)
             filename = "webp/" + filename
