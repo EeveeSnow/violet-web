@@ -53,7 +53,8 @@ def home():
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.is_private != True) 
+    news = db_sess.query(News).filter(News.is_private != True).order_by(News.created_date.desc())
+    print(list(news))
     return render_template(
         'index.html', param=param, news=news
         )
