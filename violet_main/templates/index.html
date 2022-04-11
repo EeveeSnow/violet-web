@@ -57,6 +57,25 @@
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
                 <br>
                 {% endif %}
+                {% if item.embeds == True %}
+                    {% if embeds[item.id - 1].soundcloud_html != None %}
+                        {% autoescape false %}
+                            {{ embeds[item.id - 1].soundcloud_html}}
+                        {% endautoescape %}
+                        <div
+                            style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
+                            <a href="{{ embeds[item.id - 1].soundcloud_song_author_link }}" title="{{ embeds[item.id - 1].soundcloud_song_author }}" target="_blank"
+                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_author }}</a> · <a
+                            href="{{ embeds[item.id - 1].soundcloud_link}}"
+                            title="{{ embeds[item.id -1].soundcloud_song_title }}" target="_blank"
+                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_title }}</a></div>
+                    {% endif %}
+                    {% if embeds[item.id - 1].yandex_music_song_src != None %}
+                    <iframe frameborder="0" style="border:none;width:90%;height:180px;" width="90%" height="180"
+                        src="https://music.yandex.ru/iframe/#track/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
+                    {% endif %}
+                {% endif %}
+
                 {% if item.images != None %}
                 <!-- <div class="news-box-img" style="background-image: url(static/files/{{item.images}});"> -->
                 <a href="/image:{{item.images.split('/')[1]}}:{{item.user.id}}">

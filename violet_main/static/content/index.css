@@ -222,7 +222,7 @@ news-box-author-name {
 }
 
 .news-box-support {
-    margin-top: 1rem;
+    margin-top: 0rem;
     margin-left: 1rem;
     border: var(--support_color) solid 1px;
     border-radius: 25px;
@@ -270,6 +270,8 @@ news-box-author-name {
     margin-top: 0;
     text-align: right;
     padding: 1rem;
+    padding-bottom: 0rem;
+    margin-bottom: 0px;
 }
 
 /* header */

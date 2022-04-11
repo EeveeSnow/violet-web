@@ -22,6 +22,7 @@ from werkzeug.utils import secure_filename
 from violet_main import Violet_API, app
 from violet_main.data import db_session
 from violet_main.data.news import News
+from violet_main.data.news_embed import NewsEmbed
 from violet_main.data.users import User
 from violet_main.forms.LoginForm import LoginForm
 from violet_main.forms.NewsForm import NewsForm
@@ -53,10 +54,10 @@ def home():
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
     db_sess = db_session.create_session()
+    embeds = db_sess.query(NewsEmbed)
     news = db_sess.query(News).filter(News.is_private != True).order_by(News.created_date.desc())
-    print(list(news))
     return render_template(
-        'index.html', param=param, news=news
+        'index.html', param=param, news=news, embeds=embeds
         )
 
 @app.route('/user_id:<int:user_id>')

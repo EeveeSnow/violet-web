@@ -30,8 +30,3 @@ def get_spotify_id(text):
     has["playlist"] = has_playlist
     has["album"] = has_album
     return has, out
-
-text = "https://soundcloud.com/aiobahn/grayscale?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing https://music.yandex.ru/album/18431936/track/92156836 https://open.spotify.com/track/7bDVv5WI1ZPJOVNtJvqmYb?si=f5381f8b877340af"
-has, out = get_spotify_id(text)
-print(has, out)
-

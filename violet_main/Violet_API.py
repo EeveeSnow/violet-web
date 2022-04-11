@@ -4,12 +4,19 @@ import io
 import os
 import subprocess
 import flask
+from pytest import param
+from requests import get
 from flask import jsonify, request
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
+from violet_main.api.soundcloud import get_soundcloud_id
+from violet_main.api.yandexmusic import get_yandexmusic_id
+from violet_main.api.youtube import get_youtube_id
 from violet_main.data import db_session
 from violet_main.data.news import News
 from violet_main.data.users import User
+from violet_main.data.news_embed import NewsEmbed
+from violet_main.api.spotify import get_spotify_id
 
 app_api = "XYGD6dX+$Zi1Tw2z"
 api_route = flask.Blueprint(
@@ -36,43 +43,37 @@ def create_news():
         is_private=request.json['is_private'],
         images=request.json['images'],
     )
+    embed = NewsEmbed()
     if "https://open.spotify.com/" in news_text:
-        news_text_parced = news_text.split("https://open.spotify.com/")
-        try:
-            news_track_id = list(filter(lambda x: "track/" in x, news_text_parced))[0]\
-                .split("track/")[1].split()[0].split("?")[0]
-            has_track = True
-        except IndexError:
-            has_track = False
-        try:
-            news_playlist_id = list(filter(lambda x: "playlist/" in x, news_text_parced))[0]\
-                .split("playlist/")[1].split()[0].split("?")[0]
-            has_playlist = True
-        except IndexError:
-            has_playlist = False
-        try:
-            news_album_id = list(filter(lambda x: "album/" in x, news_text_parced))[0]\
-                .split("album/")[1].split()[0].split("?")[0]
-            has_album = True
-        except IndexError:
-            has_album = False
-        if has_track:
-            news.spotify_track = news_track_id
-        if has_playlist:
-            news.spotify_playlist = news_playlist_id
-        if has_album:
-            news.spotify_album = news_album_id
+        has, out = get_spotify_id(news_text)
+        if has["track"]:
+            news.spotify_track = out["spotify_track"]
+        if has['playlist']:
+            news.spotify_playlist  = out["spotify_playlist"]
+        if has['album']:
+            news.spotify_album = out["spotify_album"]
     if "https://youtu.be/" in news_text:
-        news_text_parced = news_text.split("https://youtu")
-        try:
-            news_youtube_id = list(
-                filter(lambda x: ".be/" in x, news_text_parced))[0].split(".be/")[1].split()[0]
-            has_youtube = True
-        except IndexError:
-            has_youtube = False
-        if has_youtube:
-            news.youtube_video = news_youtube_id
+        has, out = get_youtube_id(news_text)
+        if has["youtube_video"]:
+            news.youtube_video = out["youtube_video"]
+    if "https://soundcloud.com/" in news_text:
+        soundcloud_data, soundcloud_url = get_soundcloud_id(news_text)
+        if soundcloud_data != None:
+            news.embeds = True
+            embed.soundcloud_link = soundcloud_url
+            embed.soundcloud_song_author = soundcloud_data["author_name"]
+            embed.soundcloud_song_title = soundcloud_data["title"]
+            embed.soundcloud_song_img = soundcloud_data["thumbnail_url"]
+            embed.soundcloud_song_author_link = soundcloud_data["author_url"]
+            embed.soundcloud_html = soundcloud_data["html"]
+    if "https://music.yandex.ru/" in news_text:
+        yandex_music_song_src = get_yandexmusic_id(news_text)
+        if yandex_music_song_src != None:
+            news.embeds = True
+            embed.yandex_music_song_src = yandex_music_song_src
     db_sess.add(news)
+    db_sess.commit()
+    db_sess.add(embed)
     db_sess.commit()
     return jsonify({'success': 'OK'})
 

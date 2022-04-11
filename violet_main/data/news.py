@@ -31,4 +31,6 @@ class News(SqlAlchemyBase):
 
     youtube_video = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
+    embeds = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+
     user = orm.relation('User')
