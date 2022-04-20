@@ -1,26 +1,7 @@
-{% extends "layout.html" %}
-
-{% block user %}
-{% if current_user.is_authenticated %}
-{% if param.image != None %}
-<img class="nav-profile-img" alt="profile-image" src="static/files/{{param.image}}">
-{% else %}
-<img class="nav-profile-img" alt="profile-image" src="static/images/person_default.png">
-{% endif %}
-<span class="link-text username-text">{{param.user}}</span>
-{% else %}
-<span class="link-text nousername-text">{{param.user}}</span>
-{% endif %}
-{% endblock %}
+{% extends "min-layout.html" %}
 
 {% block content %}
-
-<div class="news-template">
-    <div class="news-content">
-        {% if current_user.is_authenticated %}
-        <a href="add_news" class="btn btn-secondary">Добавить новость</a>
-        {% endif %}
-        {% for item in news%}
+{% for item in news%}
         <div class="news-box">
             <div class="news-box-content">
                 <div class="news-box-author">
@@ -48,56 +29,56 @@
                     {{item.content}}
                 </p>
                 {% if item.embeds == True %}
-                    {% if embeds[item.id - 1].spotify_playlist != None %}
+                    {% if embeds.spotify_playlist != None %}
                     <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/playlist/{{ embeds[item.id - 1].spotify_playlist }}?utm_source=generator"
+                    src="https://open.spotify.com/embed/playlist/{{ embeds.spotify_playlist }}?utm_source=generator"
                     width="90%" height="380" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
                     <br>
                     {% endif %}
-                    {% if embeds[item.id - 1].spotify_album != None %}
+                    {% if embeds.spotify_album != None %}
                     <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/album/{{ embeds[item.id - 1].spotify_album }}?utm_source=generator" width="90%"
+                    src="https://open.spotify.com/embed/album/{{ embeds.spotify_album }}?utm_source=generator" width="90%"
                     height="380" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
                     <br>
                     {% endif %}
-                    {% if embeds[item.id - 1].spotify_track != None %}
+                    {% if embeds.spotify_track != None %}
                     <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/track/{{ embeds[item.id - 1].spotify_track }}?utm_source=generator" width="90%"
+                    src="https://open.spotify.com/embed/track/{{ embeds.spotify_track }}?utm_source=generator" width="90%"
                     height="80" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
                     <br>
                     {% endif %}
-                    {% if embeds[item.id - 1].soundcloud_html != None %}
+                    {% if embeds.soundcloud_html != None %}
                         {% autoescape false %}
-                            {{ embeds[item.id - 1].soundcloud_html}}
+                            {{ embeds.soundcloud_html}}
                         {% endautoescape %}
                         <div
                             style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
-                            <a href="{{ embeds[item.id - 1].soundcloud_song_author_link }}" title="{{ embeds[item.id - 1].soundcloud_song_author }}" target="_blank"
-                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_author }}</a> · <a
-                            href="{{ embeds[item.id - 1].soundcloud_link}}"
+                            <a href="{{ embeds.soundcloud_song_author_link }}" title="{{ embeds.soundcloud_song_author }}" target="_blank"
+                            style="color: #cccccc; text-decoration: none;">{{ embeds.soundcloud_song_author }}</a> · <a
+                            href="{{ embeds.soundcloud_link}}"
                             title="{{ embeds[item.id -1].soundcloud_song_title }}" target="_blank"
-                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_title }}</a></div>
+                            style="color: #cccccc; text-decoration: none;">{{ embeds.soundcloud_song_title }}</a></div>
                     {% endif %}
-                    {% if embeds[item.id - 1].yandex_music_song_src != None %}
-                        {% if embeds[item.id - 1].yandex_music_track == True %}
+                    {% if embeds.yandex_music_song_src != None %}
+                        {% if embeds.yandex_music_track == True %}
                         <iframe frameborder="0" style="border:none;width:90%;height:180px;" width="90%" height="180"
-                        src="https://music.yandex.ru/iframe/#track/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
+                        src="https://music.yandex.ru/iframe/#track/{{ embeds.yandex_music_song_src }}"></iframe>
                         {% endif %}
-                        {% if embeds[item.id - 1].yandex_music_album == True %}
+                        {% if embeds.yandex_music_album == True %}
                         <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
-                         src="https://music.yandex.ru/iframe/#album/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
+                         src="https://music.yandex.ru/iframe/#album/{{ embeds.yandex_music_song_src }}"></iframe>
                         {% endif %}
-                        {% if embeds[item.id - 1].yandex_music_playlist == True %}
+                        {% if embeds.yandex_music_playlist == True %}
                         <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
-                         src="https://music.yandex.ru/iframe/#playlist/music-blog/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
+                         src="https://music.yandex.ru/iframe/#playlist/music-blog/{{ embeds.yandex_music_song_src }}"></iframe>
                         {% endif %}
                     {% endif %}
-                    {% if embeds[item.id - 1].youtube_video != None %}
+                    {% if embeds.youtube_video != None %}
                         <iframe width="90%" height="315"
-                        src="https://www.youtube-nocookie.com/embed/{{ embeds[item.id - 1].youtube_video }}?controls=0"
+                        src="https://www.youtube-nocookie.com/embed/{{ embeds.youtube_video }}?controls=0"
                         title="YouTube video player" frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen></iframe>
@@ -113,8 +94,7 @@
                 <br>
                 {% endif %}
                 <p class="news-box-text-date">
-                    <small class="text-muted">Дата написания -
-                        {{item.created_date.strftime('%Y %b %d %I:%M %p')}}</small>
+                    <small class="text-muted">Дата написания - {{item.created_date.strftime('%Y %b %d %I:%M %p')}}</small>
                 </p>
             </div>
             <div class="news-box-support">
@@ -135,7 +115,5 @@
         </div>
 
         {% endfor %}
-    </div>
-</div>
 
 {% endblock %}

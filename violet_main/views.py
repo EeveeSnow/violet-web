@@ -2,26 +2,24 @@
 Routes and views for the flask application.
 """
 
-from hashlib import md5
 import hashlib
 import random
-import secrets
 import string
 import os
 import subprocess
 from datetime import datetime
 
-from flask import Flask, make_response, redirect, render_template, session
+from flask import redirect, render_template
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
-from requests import post
-from werkzeug.exceptions import HTTPException
+from requests import post, delete
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 
 from violet_main import Violet_API, app
 from violet_main.data import db_session
 from violet_main.data.news import News
+from violet_main.data.news_comments import NewsComments
 from violet_main.data.news_embed import NewsEmbed
 from violet_main.data.users import User
 from violet_main.forms.LoginForm import LoginForm
@@ -84,6 +82,38 @@ def profile(user_id):
 @app.route('/image:<path:image_uri>:<int:code>')
 def image(image_uri, code):
     return render_template('image.html', image_uri=image_uri)
+
+@app.route('/news:<int:news_id>')
+def news_extra(news_id):
+    param = {}
+    if current_user.is_authenticated:
+        param["user"] = current_user.user
+        param["image"] = current_user.image
+    else:
+        param["user"] = "Войдите в аккаунт"
+        param["image"] = None
+    db_sess = db_session.create_session()
+    embeds = db_sess.query(NewsEmbed).filter(NewsEmbed.id == news_id)
+    # comments = db_sess.query(NewsComments).filter(NewsComments.news_id == news_id)
+    news = db_sess.query(News).filter(News.is_private != True).filter(News.id == news_id)
+    return render_template(
+        'news_page.html', param=param, news=news, embeds=embeds
+        )
+
+@app.route('/delete_news:<int:news_id>')
+def news_deletion(news_id):
+    db_sess = db_session.create_session()
+    news = db_sess.query(News).filter(News.id == news_id)[0]
+    server = "http://localhost:5000"
+    try:
+        if news.user.id == current_user.id:
+           print(delete(f'{server}/api/news',
+           json={'api_key': "XYGD6dX+$Zi1Tw2z",
+                 'id': news.id}).json())
+    except:
+        return redirect('/')
+    return redirect('/')
+
 
 @app.route('/for_devs')
 def dev():
