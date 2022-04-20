@@ -9,14 +9,14 @@ from requests import get
 from flask import jsonify, request
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from violet_main.api.soundcloud import get_soundcloud_id
-from violet_main.api.yandexmusic import get_yandexmusic_id
-from violet_main.api.youtube import get_youtube_id
+from violet_main.api.music_and_videos_api import get_soundcloud_id
+from violet_main.api.music_and_videos_api import get_yandexmusic_id
+from violet_main.api.music_and_videos_api import get_youtube_id
 from violet_main.data import db_session
 from violet_main.data.news import News
 from violet_main.data.users import User
 from violet_main.data.news_embed import NewsEmbed
-from violet_main.api.spotify import get_spotify_id
+from violet_main.api.music_and_videos_api import get_spotify_id
 
 app_api = "XYGD6dX+$Zi1Tw2z"
 api_route = flask.Blueprint(
@@ -47,15 +47,19 @@ def create_news():
     if "https://open.spotify.com/" in news_text:
         has, out = get_spotify_id(news_text)
         if has["track"]:
-            news.spotify_track = out["spotify_track"]
+            embed.spotify_track = out["spotify_track"]
+            news.embeds = True
         if has['playlist']:
-            news.spotify_playlist  = out["spotify_playlist"]
+            embed.spotify_playlist  = out["spotify_playlist"]
+            news.embeds = True
         if has['album']:
-            news.spotify_album = out["spotify_album"]
+            embed.spotify_album = out["spotify_album"]
+            news.embeds = True
     if "https://youtu.be/" in news_text:
         has, out = get_youtube_id(news_text)
         if has["youtube_video"]:
-            news.youtube_video = out["youtube_video"]
+            embed.youtube_video = out["youtube_video"]
+            news.embeds = True
     if "https://soundcloud.com/" in news_text:
         soundcloud_data, soundcloud_url = get_soundcloud_id(news_text)
         if soundcloud_data != None:
@@ -67,8 +71,14 @@ def create_news():
             embed.soundcloud_song_author_link = soundcloud_data["author_url"]
             embed.soundcloud_html = soundcloud_data["html"]
     if "https://music.yandex.ru/" in news_text:
-        yandex_music_song_src = get_yandexmusic_id(news_text)
+        yandex_music_song_src, has = get_yandexmusic_id(news_text)
         if yandex_music_song_src != None:
+            if has["track"]:
+                embed.yandex_music_track = True
+            if has['playlist']:
+                embed.yandex_music_playlist  = True
+            if has['album']:
+                embed.yandex_music_album = True
             news.embeds = True
             embed.yandex_music_song_src = yandex_music_song_src
     db_sess.add(news)
@@ -109,4 +119,21 @@ def post_image():
             'file_name': filename
         }
     )
-    
+
+@api_route.route('/api/news', methods=['DELETE'])
+def delete_news():
+    db_sess = db_session.create_session()
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ["api_key", 'id']):
+        return jsonify({'error': 'Bad request'})
+    elif db_sess.query(User).filter(User.bot_id == request.json['api_key']).first() is not None or\
+        request.json['api_key'] != app_api:
+        return jsonify({'error': 'wrong api key'})
+    news = db_sess.query(News).get(request.json['id'])
+    if not news:
+        return jsonify({'error': 'Not found'})
+    db_sess.delete(news)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})

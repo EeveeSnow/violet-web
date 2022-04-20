@@ -31,6 +31,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     bot_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     
     news = orm.relation("News", back_populates='user')
+
+    comments = orm.relation("NewsComments", back_populates='user')
     
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
