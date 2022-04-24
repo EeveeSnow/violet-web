@@ -41,8 +41,18 @@ body::-webkit-scrollbar-thumb {
     background: #6649b8;
 }
 
-login_form, register_form, news_form, .image-hundler {
+login_form, register_form, news_form, .image-hundler, .settings-list, .theme-menu {
     grid-area: content;
+}
+
+.card {
+    margin-top: 2rem;
+}
+
+
+.settings-list .btn-group-vertical {
+    margin-left: 25%;
+    margin-top: 2rem;
 }
 
 .image-hundler--img{

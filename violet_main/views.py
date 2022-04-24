@@ -21,10 +21,11 @@ from violet_main.data import db_session
 from violet_main.data.news import News
 from violet_main.data.news_comments import NewsComments
 from violet_main.data.news_embed import NewsEmbed
+from violet_main.data.settings import Settings
 from violet_main.data.users import User
 from violet_main.forms.LoginForm import LoginForm
 from violet_main.forms.NewsForm import NewsForm
-from violet_main.forms.PhotoForm import UploadForm
+from violet_main.forms.PhotoForm import UploadForm, UploadForm2
 from violet_main.forms.RegisterForm import RegisterForm
 
 
@@ -45,39 +46,46 @@ def load_user(user_id):
 def home():
     """Renders the home page."""
     param = {}
+    db_sess = db_session.create_session()
     if current_user.is_authenticated:
         param["user"] = current_user.user
         param["image"] = current_user.image
+        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
-    db_sess = db_session.create_session()
+        settings = None
     embeds = db_sess.query(NewsEmbed)
     news = db_sess.query(News).filter(News.is_private != True).order_by(News.created_date.desc())
     return render_template(
-        'index.html', param=param, news=news, embeds=embeds
+        'index.html', param=param, news=news, embeds=embeds, settings=settings
         )
 
 @app.route('/user_id:<int:user_id>')
 def profile(user_id):
     param = {}
+    db_sess = db_session.create_session()
     if current_user.is_authenticated:
         param["user"] = current_user.user
         param["image"] = current_user.image
         param["now_id"] = current_user.id
+        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
         param["now_id"] = ""
+        settings = None
     param["id"] = user_id
-    db_sess = db_session.create_session()
     if param["now_id"] == param["id"]:
-        news = db_sess.query(News).filter(News.user_id == user_id) 
+        news = db_sess.query(News).filter(News.user_id == user_id).order_by(News.created_date.desc()) 
     else:
-        news = db_sess.query(News).filter(News.user_id == user_id).filter(News.is_private != True) 
+        news = db_sess.query(News).filter(News.user_id == user_id)\
+            .filter(News.is_private != True).order_by(News.created_date.desc()) 
     profile_inf = db_sess.query(User).filter(User.id == user_id)
+    embeds = db_sess.query(NewsEmbed)
     exist = profile_inf.first() is not None
-    return render_template('profile.html', param=param, news=news, profile=profile_inf, profile_exs=exist)
+    return render_template('profile.html', param=param, news=news,
+     profile=profile_inf, profile_exs=exist, embeds=embeds, settings=settings)
 
 @app.route('/image:<path:image_uri>:<int:code>')
 def image(image_uri, code):
@@ -86,18 +94,20 @@ def image(image_uri, code):
 @app.route('/news:<int:news_id>')
 def news_extra(news_id):
     param = {}
+    db_sess = db_session.create_session()
     if current_user.is_authenticated:
         param["user"] = current_user.user
         param["image"] = current_user.image
+        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
-    db_sess = db_session.create_session()
+        settings = None
     embeds = db_sess.query(NewsEmbed).filter(NewsEmbed.id == news_id)
     # comments = db_sess.query(NewsComments).filter(NewsComments.news_id == news_id)
     news = db_sess.query(News).filter(News.is_private != True).filter(News.id == news_id)
     return render_template(
-        'news_page.html', param=param, news=news, embeds=embeds
+        'news_page.html', param=param, news=news, embeds=embeds, settings=settings
         )
 
 @app.route('/delete_news:<int:news_id>')
@@ -119,6 +129,24 @@ def news_deletion(news_id):
 def dev():
     return render_template("dev_page_layout.html")
 
+@app.route('/settings')
+@login_required
+def settings():
+    return render_template("settings.html")
+
+@app.route('/settings/change_theme')
+@login_required
+def change_theme_page():
+    return render_template("settings_theme.html")
+
+@app.route('/settings/change_theme/change_to:<string:theme_type>')
+@login_required
+def change_theme(theme_type):
+    db_sess = db_session.create_session()
+    settings =  db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+    settings.theme = theme_type
+    db_sess.commit()
+    return redirect('/')
 
 @app.route('/contact')
 def contact():
@@ -150,6 +178,10 @@ def teapot():
         title='Teapot'
     )
 
+@app.errorhandler(401)
+def not_login(e):
+    return redirect("/register")
+    
 @app.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
@@ -187,8 +219,11 @@ def reqister():
             user=form.name.data,
             email=form.email.data,
         )
+        settings = Settings(
+        )
         user.set_password(form.password.data)
         db_sess.add(user)
+        db_sess.add(settings)
         db_sess.commit()
         return redirect('/login')
     return render_template('register.html', title='Registration', form=form)
@@ -274,8 +309,40 @@ def bot_register():
             is_bot=True,
             bot_id=key
         )
+        settings = Settings(
+        )
         user.set_password(form.password.data)
         db_sess.add(user)
+        db_sess.add(settings)
         db_sess.commit()
         return redirect('/')
     return render_template('api.html', title='Registration', form=form)
+
+@app.route('/change_photo',  methods=['GET', 'POST'])
+@login_required
+def change_photo():
+    form = UploadForm2()
+    filename = None
+    db_sess = db_session.create_session()
+    if form.validate_on_submit():
+        file = form.image.data
+        filename = datetime.now().strftime("%m_%d_%Y_%H_%M_%S") + file.filename
+        filename = secure_filename(filename).split(".")
+        filename_raw = generate_password_hash(filename[0])
+        filename = filename_raw + "." + filename[1]
+        filename = secure_filename(filename)
+        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+        app.config['UPLOAD_FOLDER'],filename))
+        command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
+                 filename + " --output-dir violet_main/static/files/webp"
+        subprocess.call(command, shell = True)
+        os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+        app.config['UPLOAD_FOLDER'],filename))
+        filename = filename_raw + ".webp"
+        filename = secure_filename(filename)
+        filename = "webp/" + filename
+        profile =  db_sess.query(User).filter(User.id == current_user.id).first()
+        profile.image = filename
+        db_sess.commit()
+        return redirect('#')
+    return render_template('image_upload.html', image_form=form)
