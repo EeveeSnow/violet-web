@@ -32,5 +32,6 @@ SQLAlchemy-serializer==1.4.1
 toml==0.10.2
 tomli==2.0.1
 urllib3==1.26.9
+waitress==2.1.1
 Werkzeug==1.0.1
 WTForms==3.0.1
