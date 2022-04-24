@@ -92,16 +92,59 @@ body::-webkit-scrollbar-thumb {
     border: 1px solid var(--support_color);
     color: var(--text-primary);
     border-radius: .25rem;
-    padding-right: 1em;
 }
 
 .profile-img {
     max-width: 128px;
     max-height: 128px;
     display: block;
+    /* border-bottom: 1px solid var(--support_color); */
 }
 
+.profile-dropdown {
+    /* position: absolute; */
+    /* display: inline-block;
+    margin-left: calc(100% - 3rem); */
+    /* margin-top: -4rem; */
+}
 
+.profile-dropdown button {
+    border-bottom: 1px solid var(--support_color);
+}
+
+.profile-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--main-color-primary);
+    min-width: 160px;
+    margin-left: -1px;
+    margin-top: -1px;
+    border: 1px solid var(--support_color);
+    border-top: 0px;
+    border-radius: 0rem 0rem 1rem 1rem;
+    /* box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); */
+    z-index: 1;
+}
+
+.profile-dropdown-content a {
+    color: var(--text-primary);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.profile-dropdown-content a:hover {
+    background-color: var(--main-color-secondary);
+    border-radius: 0rem 0rem 1rem 1rem;
+}
+
+.profile-dropdown:hover .profile-dropdown-content {
+    display: block;
+}
+
+.name {
+    text-align: center;
+}
 /* news */
 .news-template {
     width: auto;
@@ -272,6 +315,65 @@ news-box-author-name {
     padding: 1rem;
     padding-bottom: 0rem;
     margin-bottom: 0px;
+}
+
+.dropbtn {
+    background-color: var(--main-color-primary);
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.news_dropdown {
+    position: absolute;
+    display: inline-block;
+    margin-left: calc(100% - 3rem);
+    margin-top: -4rem;
+}
+
+.news_dropdown button {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='currentColor' class='bi bi-list' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+}
+
+.news_dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--main-color-secondary);
+    min-width: 160px;
+    margin-left: -7rem;
+    border: 1px solid var(--support_color);
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.news_dropdown-content a {
+    color: var(--text-primary);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.news_dropdown:hover .news_dropdown-content {
+    display: block;
+}
+
+.news-add-btn {
+    background-color: var(--main-color-secondary);
+    border: 1px solid var(--support_color);
+    border-radius: 0rem 0rem 1rem 1rem;
+    border-top: 0px;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    font-size: 2rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* header */

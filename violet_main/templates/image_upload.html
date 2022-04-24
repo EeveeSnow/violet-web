@@ -1,0 +1,21 @@
+{% extends "min-layout.html" %}
+
+{% block content %}
+<news_form>
+<h1>Обновление аватарки</h1>
+<form action="" method="post", enctype="multipart/form-data">
+    {{ image_form.hidden_tag() }}
+    <p>
+        {{ image_form.image }} {{ image_form.image.label }}
+        {% for error in image_form.image.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+        <!-- {{ image_form.recaptcha }} -->
+    </p>
+    <p>{{ image_form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
+</form>
+</news_form>
+{% endblock %}

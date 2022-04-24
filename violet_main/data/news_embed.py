@@ -27,17 +27,25 @@ class NewsEmbed(SqlAlchemyBase):
 
     # YANDEX_MUSIC
 
-    yandex_music_link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-
     yandex_music_song_src = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
-    yandex_music_song_title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    yandex_music_track = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
-    yandex_music_song_author = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    yandex_music_playlist = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
-    yandex_music_song_author_link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    yandex_music_album = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
+    # SPOTIFY
 
+    spotify_track = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
+
+    spotify_playlist = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+
+    spotify_album = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
+
+    # YOUTUBE
+
+    youtube_video = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
 
     

@@ -23,14 +23,10 @@ class News(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, 
                                 sqlalchemy.ForeignKey("users.id"))
 
-    spotify_track = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
-
-    spotify_playlist = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-
-    spotify_album = sqlalchemy.Column(sqlalchemy.String, nullable=True) 
-
-    youtube_video = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-
     embeds = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
 
+    liked_by = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+
     user = orm.relation('User')
+
+    comments = orm.relation("NewsComments", back_populates='news_table')

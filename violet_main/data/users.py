@@ -1,5 +1,7 @@
 import datetime
 import sqlalchemy
+
+from violet_main.data.settings import Settings
 from .db_session import SqlAlchemyBase
 from sqlalchemy import orm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -31,6 +33,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     bot_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     
     news = orm.relation("News", back_populates='user')
+
+    settings = orm.relation("Settings", back_populates='user')
+
+    comments = orm.relation("NewsComments", back_populates='user')
     
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
