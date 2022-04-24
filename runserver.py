@@ -6,7 +6,7 @@ This script runs the Web_IDE application using a development server.
 from os import environ
 import os
 from random import randint
-from violet_main import app
+from violet_main.wsgi import app
 from waitress import serve
 
 

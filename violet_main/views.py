@@ -16,7 +16,8 @@ from requests import post, delete
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 
-from violet_main import Violet_API, app
+from violet_main import Violet_API
+from violet_main.wsgi import app
 from violet_main.data import db_session
 from violet_main.data.news import News
 from violet_main.data.news_comments import NewsComments
