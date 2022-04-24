@@ -263,7 +263,6 @@ def add_news():
             filename_raw = generate_password_hash(filename[0])
             filename = filename_raw + "." + filename[1]
             filename = secure_filename(filename)
-            filename = "webp/" + filename
             file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),
             app.config['UPLOAD_FOLDER'],filename))
             # command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
@@ -273,6 +272,7 @@ def add_news():
             # app.config['UPLOAD_FOLDER'],filename))
             # filename = filename_raw + ".webp"
             # filename = secure_filename(filename)
+            # filename = "webp/" + filename
         server = "http://localhost:5000"
         print(post(f'{server}/api/news',
            json={'api_key': "XYGD6dX+$Zi1Tw2z",

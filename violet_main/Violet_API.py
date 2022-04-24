@@ -103,7 +103,6 @@ def post_image():
     filename_raw = generate_password_hash(filename[0])
     filename = filename_raw + "." + filename[1]
     filename = secure_filename(filename)
-    filename = "webp/" + filename
     with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
         "static/files", filename), "wb") as file:
         file.write(base64.b64decode(request.json['image_bin'].encode('utf-8')))
@@ -114,6 +113,7 @@ def post_image():
     #     "static/files", filename))
     # filename = filename_raw + ".webp"
     # filename = secure_filename(filename)
+    # filename = "webp/" + filename
     return jsonify(
         {
             'file_name': filename
