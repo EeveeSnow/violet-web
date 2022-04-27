@@ -93,3 +93,7 @@ input {
     vertical-align: super;
     padding-top: 0px;
 }
+
+input:hover {
+    background-color: var(--second_color);
+}

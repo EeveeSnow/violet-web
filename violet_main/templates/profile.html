@@ -42,7 +42,7 @@
             {% if current_user.is_authenticated %}
             {% if item.id != current_user.id %}
             {% set user_id = current_user.id | string %}
-            {% if friends_tb[0].subscribers != None %}
+            {% if friends_tb[0].subscribers != None and friends_tb[0].subscribers != "" %}
             {% if user_id in friends_tb[0].subscribers %}
             <a class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     class="bi bi-person-check" viewBox="0 0 16 16">
@@ -60,7 +60,7 @@
                         d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
                 </svg></a>
                 {% endif %}
-            {% elif friends_tb[0].friends != None %}
+            {% elif friends_tb[0].friends != None and friends_tb[0].friends != "" %}
             {% if user_id in friends_tb[0].friends %}
             <a href="/delete_from_friends:{{ item.id }}" class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg"
                     width="32" height="32" fill="currentColor" class="bi bi-person-dash" viewBox="0 0 16 16">

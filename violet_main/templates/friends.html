@@ -37,7 +37,7 @@
         {% for item in friends[0].subscribers.split() %}
         <div class="friends-card">
             {% set user_id = item | int() %}
-            <a class="friends-card-links" href="/user_id:{{user_id - 1}}">
+            <a class="friends-card-links" href="/user_id:{{user_id }}">
                 {% if user[user_id - 1].image != None %}
                 <img class="friends-card-img" alt="profile-image" src="static/files/{{user[user_id - 1].image}}">
                 {% else %}
@@ -66,7 +66,7 @@
         {% for item in friends[0].friends.split() %}
         <div class="friends-card">
             {% set user_id = item | int() %}
-            <a class="friends-card-links" href="/user_id:{{user_id - 1}}">
+            <a class="friends-card-links" href="/user_id:{{user_id}}">
                 {% if user[user_id - 1].image != None %}
                 <img class="friends-card-img" alt="profile-image" src="static/files/{{user[user_id - 1].image}}">
                 {% else %}
