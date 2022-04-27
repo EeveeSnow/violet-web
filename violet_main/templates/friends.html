@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block user %}
+<link rel="stylesheet" type="text/css" href="/static/content/friends.css" />
+{% if current_user.is_authenticated %}
+<link rel="stylesheet" type="text/css" href="/static/content/themes/{{ settings.theme }}.css" />
+{% if param.image != None %}
+<img class="nav-profile-img" alt="profile-image" src="static/files/{{param.image}}">
+{% else %}
+<img class="nav-profile-img" alt="profile-image" src="static/images/person_default.png">
+{% endif %}
+<span class="link-text username-text">{{param.user}}</span>
+{% else %}
+<span class="link-text nousername-text">{{param.user}}</span>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="friends-template">
+    <h2>Искать:</h2>
+    <search_form>
+    <div class="search-block">
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+        {{ form.search }}
+        {% for error in form.search.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+        {{ form.submit(type="submit") }}
+    </div>
+    </search_form>
+    {% if friends != None %}
+    {% if friends[0].subscribers != None and friends[0].subscribers != "" %}
+    <h2>Подписчики:</h2>
+    <div class="friends-block">
+        {% for item in friends[0].subscribers.split() %}
+        <div class="friends-card">
+            {% set user_id = item | int() %}
+            <a class="friends-card-links" href="/user_id:{{user_id - 1}}">
+                {% if user[user_id - 1].image != None %}
+                <img class="friends-card-img" alt="profile-image" src="static/files/{{user[user_id - 1].image}}">
+                {% else %}
+                <img class="friends-card-img" alt="profile-image" src="static/images/person_default.png">
+                {% endif %}
+                <friends-card-name>{{ user[user_id - 1].user }}</friends-card-name>
+            </a>
+            {% if current_user.is_authenticated %}
+            {% if profile_inf[0].id == current_user.id %}
+            <a href="/add_to_friends:{{ user_id }}" class="add_to_friends"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="32" height="32" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                    <path
+                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                    <path fill-rule="evenodd"
+                        d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
+                </svg></a>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if friends[0].friends != None and friends[0].friends != "" %}
+    <h2>Друзья:</h2>
+    <div class="friends-block">
+        {% for item in friends[0].friends.split() %}
+        <div class="friends-card">
+            {% set user_id = item | int() %}
+            <a class="friends-card-links" href="/user_id:{{user_id - 1}}">
+                {% if user[user_id - 1].image != None %}
+                <img class="friends-card-img" alt="profile-image" src="static/files/{{user[user_id - 1].image}}">
+                {% else %}
+                <img class="friends-card-img" alt="profile-image" src="static/images/person_default.png">
+                {% endif %}
+                <friends-card-name>{{ user[user_id - 1].user }}</friends-card-name>
+            </a>
+            {% if current_user.is_authenticated %}
+            {% if profile_inf[0].id == current_user.id %}
+            <a href="/delete_from_friends:{{ user_id }}" class="add_to_friends"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="32" height="32" fill="currentColor" class="bi bi-person-dash" viewBox="0 0 16 16">
+                    <path
+                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                    <path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z" />
+                </svg>
+            </a>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endif %}
+    {% if users_s != None %}
+    <h2>Люди:</h2>
+    <div class="friends-block">
+        {% for item in users_s %}
+        <div class="friends-card">
+            <a class="friends-card-links" href="/user_id:{{item.id}}">
+                {% if item.image != None %}
+                <img class="friends-card-img" alt="profile-image" src="static/files/{{item.image}}">
+                {% else %}
+                <img class="friends-card-img" alt="profile-image" src="static/images/person_default.png">
+                {% endif %}
+                <friends-card-name>{{ item.user }}</friends-card-name>
+            </a>
+        </div>
+        {% endfor %}
+        {% endif %}
+</div> {% endblock %}

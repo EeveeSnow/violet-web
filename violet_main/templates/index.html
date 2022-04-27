@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block user %}
+<link rel="stylesheet" type="text/css" href="/static/content/news.css" />
 {% if current_user.is_authenticated %}
 <link rel="stylesheet" type="text/css" href="/static/content/themes/{{ settings.theme }}.css" />
 {% if param.image != None %}

@@ -17,6 +17,8 @@ from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 
 from violet_main import Violet_API
+from violet_main.data.friends import Friends
+from violet_main.forms.SearchForm import SearchForm
 from violet_main.wsgi import app
 from violet_main.data import db_session
 from violet_main.data.news import News
@@ -83,10 +85,57 @@ def profile(user_id):
         news = db_sess.query(News).filter(News.user_id == user_id)\
             .filter(News.is_private != True).order_by(News.created_date.desc()) 
     profile_inf = db_sess.query(User).filter(User.id == user_id)
+    friends_tb =  db_sess.query(Friends).filter(Friends.id == user_id)
     embeds = db_sess.query(NewsEmbed)
     exist = profile_inf.first() is not None
     return render_template('profile.html', param=param, news=news,
-     profile=profile_inf, profile_exs=exist, embeds=embeds, settings=settings)
+     profile=profile_inf, profile_exs=exist, embeds=embeds, settings=settings, friends_tb=friends_tb)
+
+@app.route('/friends:<int:user_id>', methods=['GET', 'POST'])
+def friends(user_id):
+    form = SearchForm()
+    param = {}
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
+        param["user"] = current_user.user
+        param["image"] = current_user.image
+        param["now_id"] = current_user.id
+        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+    else:
+        param["user"] = "Войдите в аккаунт"
+        param["image"] = None
+        param["now_id"] = ""
+        settings = None
+    param["id"] = user_id 
+    profile_inf = db_sess.query(User).filter(User.id == user_id)
+    user = db_sess.query(User) 
+    friends =  db_sess.query(Friends).filter(Friends.id == user_id)
+    exist = profile_inf.first() is not None
+    if form.validate_on_submit():
+        return redirect(f"/search:{form.search.data}")
+    return render_template('friends.html', param=param, user=user, profile_exs=exist,
+     settings=settings, friends=friends, profile_inf=profile_inf, form=form, users_s=None)
+
+@app.route('/search:<string:user>', methods=['GET', 'POST'])
+def search(user):
+    form = SearchForm()
+    param = {}
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
+        param["user"] = current_user.user
+        param["image"] = current_user.image
+        param["now_id"] = current_user.id
+        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+    else:
+        param["user"] = "Войдите в аккаунт"
+        param["image"] = None
+        param["now_id"] = ""
+        settings = None
+    users_s = db_sess.query(User).filter(User.user.like(f'%{user}%'))
+    if form.validate_on_submit():
+        return redirect(f"/search:{form.search.data}")
+    return render_template('friends.html', param=param, user=None, friends=None,
+     settings=settings, form=form, users_s=users_s)
 
 @app.route('/image:<path:image_uri>:<int:code>')
 def image(image_uri, code):
@@ -115,7 +164,7 @@ def news_extra(news_id):
 def news_deletion(news_id):
     db_sess = db_session.create_session()
     news = db_sess.query(News).filter(News.id == news_id)[0]
-    server = "http://localhost:5000"
+    server = "https://violet-web.herokuapp.com"
     try:
         if news.user.id == current_user.id:
            print(delete(f'{server}/api/news',
@@ -149,6 +198,78 @@ def change_theme(theme_type):
     db_sess.commit()
     return redirect('/')
 
+@app.route('/add_to_friends:<int:user_id>')
+@login_required
+def add_to_friends(user_id):
+    if current_user.id != user_id:
+        db_sess = db_session.create_session()
+        other_user = db_sess.query(Friends).filter(Friends.id == user_id).first()
+        curent_user =  db_sess.query(Friends).filter(Friends.id == current_user.id).first()
+        if curent_user.subscribers != None:
+            if str(user_id) in curent_user.subscribers:
+                other = str(other_user.subscribe_to).split()
+                curent = str(curent_user.subscribers).split()
+                curent.remove(str(user_id))
+                other.remove(str(current_user.id))
+                curent = " ".join(curent)
+                other = " ".join(other)
+                other_user.subscribe_to = other
+                curent_user.subscribers = curent
+                if other_user.friends != None:
+                    other_user.friends = other_user.friends + " " + str(current_user.id)
+                else:
+                    other_user.friends = str(current_user.id)
+                if curent_user.friends != None:
+                    curent_user.friends = curent_user.friends + " " + str(user_id)
+                else:
+                    curent_user.friends = str(user_id)
+            else:        
+                if other_user.subscribers != None:
+                    other_user.subscribers = other_user.subscribers + " " + str(current_user.id)
+                else:
+                    other_user.subscribers = str(current_user.id)
+                if curent_user.subscribe_to != None:
+                    curent_user.subscribe_to = curent_user.subscribe_to + " " + str(user_id)
+                else:
+                    curent_user.subscribe_to = str(user_id)
+        else:
+            if other_user.subscribers != None:
+                other_user.subscribers = other_user.subscribers + " " + str(current_user.id)
+            else:
+                other_user.subscribers = str(current_user.id)
+            if curent_user.subscribe_to != None:
+                curent_user.subscribe_to = curent_user.subscribe_to + " " + str(user_id)
+            else:
+                curent_user.subscribe_to = str(user_id)
+        db_sess.commit()
+    return redirect(f'/user_id:{user_id}')
+
+@app.route('/delete_from_friends:<int:user_id>')
+@login_required
+def delete_from_friends(user_id):
+    if current_user.id != user_id:
+        db_sess = db_session.create_session()
+        other_user = db_sess.query(Friends).filter(Friends.id == user_id).first()
+        curent_user =  db_sess.query(Friends).filter(Friends.id == current_user.id).first()
+        other = str(other_user.friends).split()
+        curent = str(curent_user.friends).split()
+        curent.remove(str(user_id))
+        other.remove(str(current_user.id))
+        curent = " ".join(curent)
+        other = " ".join(other)
+        other_user.friends = other
+        curent_user.friends = curent
+        if curent_user.subscribers != None:
+            curent_user.subscribers = curent_user.subscribers + " " + str(user_id)
+        else:
+            curent_user.subscribers = str(user_id)
+        if other_user.subscribe_to != None:
+            other_user.subscribe_to = curent_user.subscribe_to + " " + str(current_user.id)
+        else:
+            other_user.subscribe_to = str(current_user.id)
+        db_sess.commit()
+    return redirect(f'/user_id:{user_id}')
+    
 @app.route('/contact')
 def contact():
     """Renders the contact page."""
@@ -222,9 +343,11 @@ def reqister():
         )
         settings = Settings(
         )
+        friends = Friends()
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.add(settings)
+        db_sess.add(friends)
         db_sess.commit()
         return redirect('/login')
     return render_template('register.html', title='Registration', form=form)
@@ -265,15 +388,15 @@ def add_news():
             filename = secure_filename(filename)
             file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),
             app.config['UPLOAD_FOLDER'],filename))
-            # command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
-            #      filename + " --output-dir violet_main/static/files/webp"
-            # subprocess.call(command, shell = True)
-            # os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-            # app.config['UPLOAD_FOLDER'],filename))
-            # filename = filename_raw + ".webp"
-            # filename = secure_filename(filename)
-            # filename = "webp/" + filename
-        server = "http://localhost:5000"
+            command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
+                 filename + " --output-dir violet_main/static/files/webp"
+            subprocess.call(command, shell = True)
+            os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+            app.config['UPLOAD_FOLDER'],filename))
+            filename = filename_raw + ".webp"
+            filename = secure_filename(filename)
+            filename = "webp/" + filename
+        server = "https://violet-web.herokuapp.com"
         print(post(f'{server}/api/news',
            json={'api_key': "XYGD6dX+$Zi1Tw2z",
                  'content': form.content.data,
@@ -312,9 +435,11 @@ def bot_register():
         )
         settings = Settings(
         )
+        friends = Friends()
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.add(settings)
+        db_sess.add(friends)
         db_sess.commit()
         return redirect('/')
     return render_template('api.html', title='Registration', form=form)

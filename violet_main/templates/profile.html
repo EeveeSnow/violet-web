@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 {% block user %}
+<link rel="stylesheet" type="text/css" href="/static/content/news.css" />
+<link rel="stylesheet" type="text/css" href="/static/content/profile.css" />
 {% if current_user.is_authenticated %}
 <link rel="stylesheet" type="text/css" href="/static/content/themes/{{ settings.theme }}.css" />
 {% if param.image != None %}
@@ -37,6 +39,60 @@
                 {% endif %}
             </div>
             <h2 class="name">{{item.user}}</h2>
+            {% if current_user.is_authenticated %}
+            {% if item.id != current_user.id %}
+            {% set user_id = current_user.id | string %}
+            {% if friends_tb[0].subscribers != None %}
+            {% if user_id in friends_tb[0].subscribers %}
+            <a class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    class="bi bi-person-check" viewBox="0 0 16 16">
+                    <path
+                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                    <path fill-rule="evenodd"
+                        d="M15.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
+                </svg></a>
+                {% else %}
+                <a href="/add_to_friends:{{ item.id }}" class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="32" height="32" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                    <path
+                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                    <path fill-rule="evenodd"
+                        d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
+                </svg></a>
+                {% endif %}
+            {% elif friends_tb[0].friends != None %}
+            {% if user_id in friends_tb[0].friends %}
+            <a href="/delete_from_friends:{{ item.id }}" class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="32" height="32" fill="currentColor" class="bi bi-person-dash" viewBox="0 0 16 16">
+                    <path
+                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                    <path fill-rule="evenodd" d="M11 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z" />
+                </svg></a>
+                {% else %}
+                <a href="/add_to_friends:{{ item.id }}" class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="32" height="32" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                    <path
+                        d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                    <path fill-rule="evenodd"
+                        d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
+                </svg></a>
+            {% endif %}
+            {% else %}
+            <a href="/add_to_friends:{{ item.id }}" class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg"
+                width="32" height="32" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                <path
+                    d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                <path fill-rule="evenodd"
+                    d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
+            </svg></a>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            <a href="/friends:{{ item.id }}" class="profile-friend"><svg xmlns="http://www.w3.org/2000/svg" width="32"
+                    height="32" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                    <path
+                        d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
+                </svg></a>
             {% endfor %}
             {% if not profile_exs %}
             <h1 class="user_not_exist"> Такого пользователя не существует </h1>
@@ -48,7 +104,11 @@
 <div class="news-template">
     <div class="news-content">
         {% if current_user.is_authenticated %}
+        {% for item in profile %}
+        {% if item.id == current_user.id %}
         <a href="add_news" class="news-add-btn">Добавить новость</a>
+        {% endif %}
+        {% endfor %}
         {% endif %}
         {% for item in news%}
         <div class="news-box">
@@ -66,72 +126,74 @@
                 <div class="news_dropdown">
                     <button class="dropbtn"></button>
                     <div class="news_dropdown-content">
-                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_authenticated %}
                         {% if item.user.id == current_user.id %}
-                            <a href="/delete_news:{{item.id}}">Удалить</a>
+                        <a href="/delete_news:{{item.id}}">Удалить</a>
                         {% endif %}
-                    {% endif %}
-                    <a href="/news:{{item.id}}">Открыть</a>
+                        {% endif %}
+                        <a href="/news:{{item.id}}">Открыть</a>
                     </div>
                 </div>
                 <p class="news-box-text">
                     {{item.content}}
                 </p>
                 {% if item.embeds == True %}
-                    {% if embeds[item.id - 1].spotify_playlist != None %}
-                    <iframe style="border-radius:12px"
+                {% if embeds[item.id - 1].spotify_playlist != None %}
+                <iframe style="border-radius:12px"
                     src="https://open.spotify.com/embed/playlist/{{ embeds[item.id - 1].spotify_playlist }}?utm_source=generator"
                     width="90%" height="380" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
-                    <br>
-                    {% endif %}
-                    {% if embeds[item.id - 1].spotify_album != None %}
-                    <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/album/{{ embeds[item.id - 1].spotify_album }}?utm_source=generator" width="90%"
-                    height="380" frameBorder="0" allowfullscreen=""
+                <br>
+                {% endif %}
+                {% if embeds[item.id - 1].spotify_album != None %}
+                <iframe style="border-radius:12px"
+                    src="https://open.spotify.com/embed/album/{{ embeds[item.id - 1].spotify_album }}?utm_source=generator"
+                    width="90%" height="380" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
-                    <br>
-                    {% endif %}
-                    {% if embeds[item.id - 1].spotify_track != None %}
-                    <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/track/{{ embeds[item.id - 1].spotify_track }}?utm_source=generator" width="90%"
-                    height="80" frameBorder="0" allowfullscreen=""
+                <br>
+                {% endif %}
+                {% if embeds[item.id - 1].spotify_track != None %}
+                <iframe style="border-radius:12px"
+                    src="https://open.spotify.com/embed/track/{{ embeds[item.id - 1].spotify_track }}?utm_source=generator"
+                    width="90%" height="80" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
-                    <br>
-                    {% endif %}
-                    {% if embeds[item.id - 1].soundcloud_html != None %}
-                        {% autoescape false %}
-                            {{ embeds[item.id - 1].soundcloud_html}}
-                        {% endautoescape %}
-                        <div
-                            style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
-                            <a href="{{ embeds[item.id - 1].soundcloud_song_author_link }}" title="{{ embeds[item.id - 1].soundcloud_song_author }}" target="_blank"
-                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_author }}</a> · <a
-                            href="{{ embeds[item.id - 1].soundcloud_link}}"
-                            title="{{ embeds[item.id -1].soundcloud_song_title }}" target="_blank"
-                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_title }}</a></div>
-                    {% endif %}
-                    {% if embeds[item.id - 1].yandex_music_song_src != None %}
-                        {% if embeds[item.id - 1].yandex_music_track == True %}
-                        <iframe frameborder="0" style="border:none;width:90%;height:180px;" width="90%" height="180"
-                        src="https://music.yandex.ru/iframe/#track/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
-                        {% endif %}
-                        {% if embeds[item.id - 1].yandex_music_album == True %}
-                        <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
-                         src="https://music.yandex.ru/iframe/#album/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
-                        {% endif %}
-                        {% if embeds[item.id - 1].yandex_music_playlist == True %}
-                        <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
-                         src="https://music.yandex.ru/iframe/#playlist/music-blog/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
-                        {% endif %}
-                    {% endif %}
-                    {% if embeds[item.id - 1].youtube_video != None %}
-                        <iframe width="90%" height="315"
-                        src="https://www.youtube-nocookie.com/embed/{{ embeds[item.id - 1].youtube_video }}?controls=0"
-                        title="YouTube video player" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen></iframe>
-                    {% endif %}
+                <br>
+                {% endif %}
+                {% if embeds[item.id - 1].soundcloud_html != None %}
+                {% autoescape false %}
+                {{ embeds[item.id - 1].soundcloud_html}}
+                {% endautoescape %}
+                <div
+                    style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
+                    <a href="{{ embeds[item.id - 1].soundcloud_song_author_link }}"
+                        title="{{ embeds[item.id - 1].soundcloud_song_author }}" target="_blank"
+                        style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_author }}</a>
+                    · <a href="{{ embeds[item.id - 1].soundcloud_link}}"
+                        title="{{ embeds[item.id -1].soundcloud_song_title }}" target="_blank"
+                        style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_title }}</a>
+                </div>
+                {% endif %}
+                {% if embeds[item.id - 1].yandex_music_song_src != None %}
+                {% if embeds[item.id - 1].yandex_music_track == True %}
+                <iframe frameborder="0" style="border:none;width:90%;height:180px;" width="90%" height="180"
+                    src="https://music.yandex.ru/iframe/#track/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
+                {% endif %}
+                {% if embeds[item.id - 1].yandex_music_album == True %}
+                <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
+                    src="https://music.yandex.ru/iframe/#album/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
+                {% endif %}
+                {% if embeds[item.id - 1].yandex_music_playlist == True %}
+                <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
+                    src="https://music.yandex.ru/iframe/#playlist/music-blog/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
+                {% endif %}
+                {% endif %}
+                {% if embeds[item.id - 1].youtube_video != None %}
+                <iframe width="90%" height="315"
+                    src="https://www.youtube-nocookie.com/embed/{{ embeds[item.id - 1].youtube_video }}?controls=0"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+                {% endif %}
                 {% endif %}
 
 

@@ -106,14 +106,14 @@ def post_image():
     with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
         "static/files", filename), "wb") as file:
         file.write(base64.b64decode(request.json['image_bin'].encode('utf-8')))
-    # command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
-    #              filename + " --output-dir violet_main/static/files/webp"
-    # subprocess.call(command, shell = True)
-    # os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-    #     "static/files", filename))
-    # filename = filename_raw + ".webp"
-    # filename = secure_filename(filename)
-    # filename = "webp/" + filename
+    command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
+                 filename + " --output-dir violet_main/static/files/webp"
+    subprocess.call(command, shell = True)
+    os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
+        "static/files", filename))
+    filename = filename_raw + ".webp"
+    filename = secure_filename(filename)
+    filename = "webp/" + filename
     return jsonify(
         {
             'file_name': filename

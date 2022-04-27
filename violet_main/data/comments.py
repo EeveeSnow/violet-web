@@ -6,26 +6,25 @@ from .db_session import SqlAlchemyBase
 
 
 class News_Info(SqlAlchemyBase):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs):
-        __tablename__ = 'news_comments_for'
+    
+    __tablename__ = 'news_comments'
 
-        id = sqlalchemy.Column(sqlalchemy.Integer, 
-                        primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, 
+            primary_key=True, autoincrement=True)
 
-        news_id = sqlalchemy.Column(sqlalchemy.Integer, 
+    news_id = sqlalchemy.Column(sqlalchemy.Integer, 
                                 sqlalchemy.ForeignKey("news.id"))
 
-        comment_content = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    comment_content = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
-        images = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    images = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
-        comment_date = sqlalchemy.Column(sqlalchemy.DateTime, 
+    comment_date = sqlalchemy.Column(sqlalchemy.DateTime, 
                                      default=datetime.datetime.now)
 
-        user_id = sqlalchemy.Column(sqlalchemy.Integer, 
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, 
                                 sqlalchemy.ForeignKey("users.id"))
 
-        user = orm.relation('User')
+    user = orm.relation('User')
 
-        news = orm.relation('News')
+    news = orm.relation('News')
