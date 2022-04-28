@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block user %}
+<link rel="stylesheet" type="text/css" href="/static/content/friends.css" />
+{% if current_user.is_authenticated %}
+<link rel="stylesheet" type="text/css" href="/static/content/themes/{{ settings.theme }}.css" />
+{% if param.image != None %}
+<img class="nav-profile-img" alt="profile-image" src="static/files/{{param.image}}">
+{% else %}
+<img class="nav-profile-img" alt="profile-image" src="static/images/person_default.png">
+{% endif %}
+<span class="link-text username-text">{{param.user}}</span>
+{% else %}
+<span class="link-text nousername-text">{{param.user}}</span>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="messages-template">
+    <div class="messages-content">
+        {% if messages != None %}
+        {% for item in messages %}
+        {% if item.sender == current_user.id %}
+        <div class="message-box right">
+            <div class="message-box-text"> item.text </div>
+        </div>
+        {% else %}
+        <div class="message-box left">
+            <div class="message-box-text"> item.text </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

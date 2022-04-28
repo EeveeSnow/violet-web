@@ -1,0 +1,39 @@
+.messages-template {
+    width: auto;
+
+    height: 100%;
+
+    grid-area: news;
+}
+
+.messages-content {
+    overflow: scroll;
+    background-color: var(--main-color-secondary);
+    height: 100%;
+    flex-direction: column;
+    margin-bottom: 3em;
+}
+
+.news-box {
+    margin-top: .5em;
+    width: 15rem;
+    min-height: 2rem;
+    word-wrap: break-word;
+    background-color: var(--main-color-primary);
+    border: 1px solid var(--support_color);
+    color: var(--text-primary);
+    border-radius: 1rem;
+}
+
+.right {
+    margin-left: 10rem;
+}
+
+.left {
+    margin-left: 1rem;
+}
+
+.message-box-text {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
