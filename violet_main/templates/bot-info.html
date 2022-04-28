@@ -1,0 +1,17 @@
+{% extends "min-layout.html" %}
+
+{% block content %}
+
+{% if item.is_bot %}
+<figure class="text-center settings-list">
+    <blockquote class="blockquote">
+      <p>{{ item.user }}</p>
+    </blockquote>
+    <figcaption class="blockquote-footer">
+        <p><abbr title="{{ item.bot_id }}">наведитесь чтобы увидеть ключ к api вашего бота</abbr></p>
+    </figcaption>
+  </figure>
+{% else %}
+<h1 class="display-1 settings-list"> Кажется вы не робот </h1>
+{% endif %}
+{% endblock %}

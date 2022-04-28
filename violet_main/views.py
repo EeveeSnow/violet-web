@@ -472,3 +472,10 @@ def change_photo():
         db_sess.commit()
         return redirect('#')
     return render_template('image_upload.html', image_form=form)
+
+@app.route('/bot_info')
+@login_required
+def bot_info():
+    db_sess = db_session.create_session()
+    profile =  db_sess.query(User).filter(User.id == current_user.id).first()
+    return render_template('bot-info.html', item=profile)
