@@ -1,0 +1,52 @@
+.chats-template {
+    width: auto;
+
+    height: 100%;
+
+    grid-area: news;
+}
+
+.chats-block {
+    margin-top: 1rem;
+    margin-left: 1rem;
+    background-color: var(--main-color-secondary);
+    justify-content: center;
+    border-radius: 1rem;
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+}
+
+.chats-card {
+    margin-top: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    border: var(--support_color) solid 1px;
+    border-radius: 25px;
+    display: flex;
+    width: 30rem;
+    max-height: 3rem;
+    margin-bottom: 1rem;
+}
+
+.chats-card-img {
+    max-width: 2rem;
+    max-height: 2rem;
+    margin: .5rem;
+    border-radius: 1rem;
+    border: 0px;
+}
+
+chats-card-name {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-size: 2rem;
+    align-self: start;
+    padding-right: 1rem;
+    vertical-align: super;
+    position: relative;
+    bottom: .5rem;
+}
+
+h2 {
+    color: var(--text-primary);
+}

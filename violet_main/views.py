@@ -3,38 +3,37 @@ Routes and views for the flask application.
 """
 
 import hashlib
+import os
 import random
 import string
-import os
 import subprocess
 from datetime import datetime
 
 from flask import redirect, render_template
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
-from requests import post, delete
+from requests import delete, post
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 
 from violet_main import Violet_API
+from violet_main.data import db_session, db_session_cm
+from violet_main.data.chats import Chats
 from violet_main.data.friends import Friends
-from violet_main.forms.SearchForm import SearchForm
-from violet_main.wsgi import app
-from violet_main.data import db_session
-from violet_main.data import db_session_cm
+from violet_main.data.messenger import Messenger
+from violet_main.data.messenger_embed import MessengerEmbed
 from violet_main.data.news import News
 from violet_main.data.news_comments import NewsComments
 from violet_main.data.news_embed import NewsEmbed
 from violet_main.data.settings import Settings
 from violet_main.data.users import User
 from violet_main.forms.LoginForm import LoginForm
+from violet_main.forms.MessageForm import MessageForm
 from violet_main.forms.NewsForm import NewsForm
 from violet_main.forms.PhotoForm import UploadForm, UploadForm2
 from violet_main.forms.RegisterForm import RegisterForm
-from violet_main.forms.MessageForm import MessageForm
-from violet_main.data.chats import Chats
-from violet_main.data.messenger import Messenger
-
+from violet_main.forms.SearchForm import SearchForm
+from violet_main.wsgi import app
 
 db_session.global_init("violet_main/db/data.db")
 db_session_cm.global_init("violet_main/db/messenger.db")
@@ -49,6 +48,7 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
+
 @app.route('/')
 @app.route('/news')
 def home():
@@ -58,16 +58,19 @@ def home():
     if current_user.is_authenticated:
         param["user"] = current_user.user
         param["image"] = current_user.image
-        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+        settings = db_sess.query(Settings).filter(
+            Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
         settings = None
     embeds = db_sess.query(NewsEmbed)
-    news = db_sess.query(News).filter(News.is_private != True).order_by(News.created_date.desc())
+    news = db_sess.query(News).filter(
+        News.is_private != True).order_by(News.created_date.desc())
     return render_template(
-        'index.html', param=param, news=news, embeds=embeds, settings=settings
-        )
+        'index.html', title="Новости", param=param, news=news, embeds=embeds, settings=settings
+    )
+
 
 @app.route('/user_id:<int:user_id>')
 def profile(user_id):
@@ -77,7 +80,8 @@ def profile(user_id):
         param["user"] = current_user.user
         param["image"] = current_user.image
         param["now_id"] = current_user.id
-        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+        settings = db_sess.query(Settings).filter(
+            Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
@@ -85,16 +89,18 @@ def profile(user_id):
         settings = None
     param["id"] = user_id
     if param["now_id"] == param["id"]:
-        news = db_sess.query(News).filter(News.user_id == user_id).order_by(News.created_date.desc()) 
+        news = db_sess.query(News).filter(
+            News.user_id == user_id).order_by(News.created_date.desc())
     else:
         news = db_sess.query(News).filter(News.user_id == user_id)\
-            .filter(News.is_private != True).order_by(News.created_date.desc()) 
+            .filter(News.is_private != True).order_by(News.created_date.desc())
     profile_inf = db_sess.query(User).filter(User.id == user_id)
-    friends_tb =  db_sess.query(Friends).filter(Friends.id == user_id)
+    friends_tb = db_sess.query(Friends).filter(Friends.id == user_id)
     embeds = db_sess.query(NewsEmbed)
     exist = profile_inf.first() is not None
-    return render_template('profile.html', param=param, news=news,
-     profile=profile_inf, profile_exs=exist, embeds=embeds, settings=settings, friends_tb=friends_tb)
+    return render_template('profile.html', title="Профиль", param=param, news=news,
+                           profile=profile_inf, profile_exs=exist, embeds=embeds, settings=settings, friends_tb=friends_tb)
+
 
 @app.route('/friends:<int:user_id>', methods=['GET', 'POST'])
 def friends(user_id):
@@ -105,21 +111,23 @@ def friends(user_id):
         param["user"] = current_user.user
         param["image"] = current_user.image
         param["now_id"] = current_user.id
-        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+        settings = db_sess.query(Settings).filter(
+            Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
         param["now_id"] = ""
         settings = None
-    param["id"] = user_id 
+    param["id"] = user_id
     profile_inf = db_sess.query(User).filter(User.id == user_id)
-    user = db_sess.query(User) 
-    friends =  db_sess.query(Friends).filter(Friends.id == user_id)
+    user = db_sess.query(User)
+    friends = db_sess.query(Friends).filter(Friends.id == user_id)
     exist = profile_inf.first() is not None
     if form.validate_on_submit():
         return redirect(f"/search:{form.search.data}")
-    return render_template('friends.html', param=param, user=user, profile_exs=exist,
-     settings=settings, friends=friends, profile_inf=profile_inf, form=form, users_s=None)
+    return render_template('friends.html', title="Друзья", param=param, user=user, profile_exs=exist,
+                           settings=settings, friends=friends, profile_inf=profile_inf, form=form, users_s=None)
+
 
 @app.route('/search:<string:user>', methods=['GET', 'POST'])
 def search(user):
@@ -130,7 +138,8 @@ def search(user):
         param["user"] = current_user.user
         param["image"] = current_user.image
         param["now_id"] = current_user.id
-        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+        settings = db_sess.query(Settings).filter(
+            Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
@@ -139,12 +148,14 @@ def search(user):
     users_s = db_sess.query(User).filter(User.user.like(f'%{user}%'))
     if form.validate_on_submit():
         return redirect(f"/search:{form.search.data}")
-    return render_template('friends.html', param=param, user=None, friends=None,
-     settings=settings, form=form, users_s=users_s)
+    return render_template('friends.html', title="Поиск", param=param, user=None, friends=None,
+                           settings=settings, form=form, users_s=users_s)
+
 
 @app.route('/image:<path:image_uri>:<int:code>')
 def image(image_uri, code):
-    return render_template('image.html', image_uri=image_uri)
+    return render_template('image.html', title="Изображение", image_uri=image_uri)
+
 
 @app.route('/news:<int:news_id>')
 def news_extra(news_id):
@@ -153,17 +164,20 @@ def news_extra(news_id):
     if current_user.is_authenticated:
         param["user"] = current_user.user
         param["image"] = current_user.image
-        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+        settings = db_sess.query(Settings).filter(
+            Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
         settings = None
     embeds = db_sess.query(NewsEmbed).filter(NewsEmbed.id == news_id)
     # comments = db_sess.query(NewsComments).filter(NewsComments.news_id == news_id)
-    news = db_sess.query(News).filter(News.is_private != True).filter(News.id == news_id)
+    news = db_sess.query(News).filter(
+        News.is_private != True).filter(News.id == news_id)
     return render_template(
-        'news_page.html', param=param, news=news, embeds=embeds, settings=settings
-        )
+        'news_page.html', title="Новости", param=param, news=news, embeds=embeds, settings=settings
+    )
+
 
 @app.route('/delete_news:<int:news_id>')
 def news_deletion(news_id):
@@ -172,9 +186,9 @@ def news_deletion(news_id):
     server = "https://violet-web.herokuapp.com"
     try:
         if news.user.id == current_user.id:
-           print(delete(f'{server}/api/news',
-           json={'api_key': "XYGD6dX+$Zi1Tw2z",
-                 'id': news.id}).json())
+            print(delete(f'{server}/api/news',
+                         json={'api_key': "XYGD6dX+$Zi1Tw2z",
+                               'id': news.id}).json())
     except:
         return redirect('/')
     return redirect('/')
@@ -184,32 +198,39 @@ def news_deletion(news_id):
 def dev():
     return render_template("dev_page_layout.html")
 
+
 @app.route('/settings')
 @login_required
 def settings():
     return render_template("settings.html")
+
 
 @app.route('/settings/change_theme')
 @login_required
 def change_theme_page():
     return render_template("settings_theme.html")
 
+
 @app.route('/settings/change_theme/change_to:<string:theme_type>')
 @login_required
 def change_theme(theme_type):
     db_sess = db_session.create_session()
-    settings =  db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+    settings = db_sess.query(Settings).filter(
+        Settings.id == current_user.id).first()
     settings.theme = theme_type
     db_sess.commit()
     return redirect('/')
+
 
 @app.route('/add_to_friends:<int:user_id>')
 @login_required
 def add_to_friends(user_id):
     if current_user.id != user_id:
         db_sess = db_session.create_session()
-        other_user = db_sess.query(Friends).filter(Friends.id == user_id).first()
-        curent_user =  db_sess.query(Friends).filter(Friends.id == current_user.id).first()
+        other_user = db_sess.query(Friends).filter(
+            Friends.id == user_id).first()
+        curent_user = db_sess.query(Friends).filter(
+            Friends.id == current_user.id).first()
         if curent_user.subscribers != None:
             if str(user_id) in curent_user.subscribers:
                 other = str(other_user.subscribe_to).split()
@@ -221,41 +242,50 @@ def add_to_friends(user_id):
                 other_user.subscribe_to = other
                 curent_user.subscribers = curent
                 if other_user.friends != None:
-                    other_user.friends = other_user.friends + " " + str(current_user.id)
+                    other_user.friends = other_user.friends + \
+                        " " + str(current_user.id)
                 else:
                     other_user.friends = str(current_user.id)
                 if curent_user.friends != None:
-                    curent_user.friends = curent_user.friends + " " + str(user_id)
+                    curent_user.friends = curent_user.friends + \
+                        " " + str(user_id)
                 else:
                     curent_user.friends = str(user_id)
-            else:        
+            else:
                 if other_user.subscribers != None:
-                    other_user.subscribers = other_user.subscribers + " " + str(current_user.id)
+                    other_user.subscribers = other_user.subscribers + \
+                        " " + str(current_user.id)
                 else:
                     other_user.subscribers = str(current_user.id)
                 if curent_user.subscribe_to != None:
-                    curent_user.subscribe_to = curent_user.subscribe_to + " " + str(user_id)
+                    curent_user.subscribe_to = curent_user.subscribe_to + \
+                        " " + str(user_id)
                 else:
                     curent_user.subscribe_to = str(user_id)
         else:
             if other_user.subscribers != None:
-                other_user.subscribers = other_user.subscribers + " " + str(current_user.id)
+                other_user.subscribers = other_user.subscribers + \
+                    " " + str(current_user.id)
             else:
                 other_user.subscribers = str(current_user.id)
             if curent_user.subscribe_to != None:
-                curent_user.subscribe_to = curent_user.subscribe_to + " " + str(user_id)
+                curent_user.subscribe_to = curent_user.subscribe_to + \
+                    " " + str(user_id)
             else:
                 curent_user.subscribe_to = str(user_id)
         db_sess.commit()
     return redirect(f'/user_id:{user_id}')
+
 
 @app.route('/delete_from_friends:<int:user_id>')
 @login_required
 def delete_from_friends(user_id):
     if current_user.id != user_id:
         db_sess = db_session.create_session()
-        other_user = db_sess.query(Friends).filter(Friends.id == user_id).first()
-        curent_user =  db_sess.query(Friends).filter(Friends.id == current_user.id).first()
+        other_user = db_sess.query(Friends).filter(
+            Friends.id == user_id).first()
+        curent_user = db_sess.query(Friends).filter(
+            Friends.id == current_user.id).first()
         other = str(other_user.friends).split()
         curent = str(curent_user.friends).split()
         curent.remove(str(user_id))
@@ -265,16 +295,19 @@ def delete_from_friends(user_id):
         other_user.friends = other
         curent_user.friends = curent
         if curent_user.subscribers != None:
-            curent_user.subscribers = curent_user.subscribers + " " + str(user_id)
+            curent_user.subscribers = curent_user.subscribers + \
+                " " + str(user_id)
         else:
             curent_user.subscribers = str(user_id)
         if other_user.subscribe_to != None:
-            other_user.subscribe_to = curent_user.subscribe_to + " " + str(current_user.id)
+            other_user.subscribe_to = curent_user.subscribe_to + \
+                " " + str(current_user.id)
         else:
             other_user.subscribe_to = str(current_user.id)
         db_sess.commit()
     return redirect(f'/user_id:{user_id}')
-    
+
+
 @app.route('/contact')
 def contact():
     """Renders the contact page."""
@@ -284,6 +317,7 @@ def contact():
         year=datetime.now().year,
         message='Your contact page.'
     )
+
 
 @app.route('/about')
 def about():
@@ -295,7 +329,9 @@ def about():
         message='Your application description page.'
     )
 
-#ERRORS PAGES
+# ERRORS PAGES
+
+
 @app.errorhandler(418)
 @app.route('/teapot')
 def teapot():
@@ -305,14 +341,17 @@ def teapot():
         title='Teapot'
     )
 
+
 @app.errorhandler(401)
 def not_login(e):
     return redirect("/register")
-    
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
     return render_template('errors/404.html', title="404"), 404
+
 
 @app.errorhandler(500)
 def error500(e):
@@ -322,12 +361,14 @@ def error500(e):
         title='500'
     )
 
+
 @app.route("/main")
 def main():
     if current_user.is_authenticated:
         return redirect('/')
     else:
         return redirect('/login')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -349,20 +390,26 @@ def reqister():
         settings = Settings(
         )
         friends = Friends()
+        db_sess_cm = db_session_cm.create_session()
+        ch = Chats()
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.add(settings)
         db_sess.add(friends)
+        db_sess_cm.add(ch)
         db_sess.commit()
+        db_sess_cm.commit()
         return redirect('/login')
     return render_template('register.html', title='Registration', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        user = db_sess.query(User).filter(
+            User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
@@ -371,11 +418,13 @@ def login():
                                form=form)
     return render_template('login.html', title='Autorisation', form=form)
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect("/")
+
 
 @app.route('/add_news',  methods=['GET', 'POST'])
 @login_required
@@ -392,25 +441,26 @@ def add_news():
             filename = filename_raw + "." + filename[1]
             filename = secure_filename(filename)
             file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-            app.config['UPLOAD_FOLDER'],filename))
+                                   app.config['UPLOAD_FOLDER'], filename))
             command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
-                 filename + " --output-dir violet_main/static/files/webp"
-            subprocess.call(command, shell = True)
+                filename + " --output-dir violet_main/static/files/webp"
+            subprocess.call(command, shell=True)
             os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-            app.config['UPLOAD_FOLDER'],filename))
+                                   app.config['UPLOAD_FOLDER'], filename))
             filename = filename_raw + ".webp"
             filename = secure_filename(filename)
             filename = "webp/" + filename
         server = "https://violet-web.herokuapp.com"
         print(post(f'{server}/api/news',
-           json={'api_key': "XYGD6dX+$Zi1Tw2z",
-                 'content': form.content.data,
-                 'user_id': current_user.id,
-                 'images': filename,
-                 'is_private': form.is_private.data}).json())
+                   json={'api_key': "XYGD6dX+$Zi1Tw2z",
+                         'content': form.content.data,
+                         'user_id': current_user.id,
+                         'images': filename,
+                         'is_private': form.is_private.data}).json())
         return redirect('/')
-    return render_template('news.html', 
+    return render_template('news.html', title="Написание новости",
                            form=form, image_form=form2)
+
 
 @app.route('/api-bot-register', methods=['GET', 'POST'])
 def bot_register():
@@ -449,6 +499,7 @@ def bot_register():
         return redirect('/')
     return render_template('api.html', title='Registration', form=form)
 
+
 @app.route('/change_photo',  methods=['GET', 'POST'])
 @login_required
 def change_photo():
@@ -463,38 +514,54 @@ def change_photo():
         filename = filename_raw + "." + filename[1]
         filename = secure_filename(filename)
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-        app.config['UPLOAD_FOLDER'],filename))
+                               app.config['UPLOAD_FOLDER'], filename))
         command = "npx @squoosh/cli --webp auto " + "violet_main/static/files/" +\
-                 filename + " --output-dir violet_main/static/files/webp"
-        subprocess.call(command, shell = True)
+            filename + " --output-dir violet_main/static/files/webp"
+        subprocess.call(command, shell=True)
         os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-        app.config['UPLOAD_FOLDER'],filename))
+                               app.config['UPLOAD_FOLDER'], filename))
         filename = filename_raw + ".webp"
         filename = secure_filename(filename)
         filename = "webp/" + filename
-        profile =  db_sess.query(User).filter(User.id == current_user.id).first()
+        profile = db_sess.query(User).filter(
+            User.id == current_user.id).first()
         profile.image = filename
         db_sess.commit()
         return redirect('#')
-    return render_template('image_upload.html', image_form=form)
+    return render_template('image_upload.html', title="Загрузка изображения", image_form=form)
+
 
 @app.route('/bot_info')
 @login_required
 def bot_info():
     db_sess = db_session.create_session()
-    profile =  db_sess.query(User).filter(User.id == current_user.id).first()
+    profile = db_sess.query(User).filter(User.id == current_user.id).first()
     return render_template('bot-info.html', item=profile)
 
-@app.route('/start_chat:<int:user_id>') # хотелка начать с кемто чатик
+
+@app.route('/start_chat:<int:user_id>')  # хотелка начать с кемто чатик
 @login_required
 def start_chat(user_id):
     if current_user.id != user_id:
-        db_sess = db_session.create_session()
-        other_user = db_sess.query(Chats).filter(Chats.id == user_id).first()
-        curent_user =  db_sess.query(Chats).filter(Chats.id == current_user.id).first()
-        if str(user_id) not in curent_user.chats:
+        db_sess_cm = db_session_cm.create_session()
+        other_user = db_sess_cm.query(Chats).filter(
+            Chats.id == user_id).first()
+        curent_user = db_sess_cm.query(Chats).filter(
+            Chats.id == current_user.id).first()
+        if curent_user.chats == None or curent_user.chats == "":
             if other_user.chats != None:
-                other_user.chats = other_user.chats + " " + str(current_user.id)
+                other_user.chats = other_user.chats + \
+                    " " + str(current_user.id)
+            else:
+                other_user.chats = str(current_user.id)
+            if curent_user.chats != None:
+                curent_user.chats = curent_user.chats + " " + str(user_id)
+            else:
+                curent_user.chats = str(user_id)
+        elif str(user_id) not in curent_user.chats:
+            if other_user.chats != None:
+                other_user.chats = other_user.chats + \
+                    " " + str(current_user.id)
             else:
                 other_user.chats = str(current_user.id)
             if curent_user.chats != None:
@@ -502,45 +569,63 @@ def start_chat(user_id):
             else:
                 curent_user.chats = str(user_id)
         else:
-            return redirect(f'/messenger:<int:user_id>') # чатик уже есть > перенаправляет на него
-        db_sess.commit() 
+            # чатик уже есть > перенаправляет на него
+            return redirect(f'/messenger:{user_id}')
+        db_sess_cm.commit()
+        return redirect(f'/messenger:{user_id}')
     return redirect(f'/user_id:{user_id}')
 
-@app.route('/chats:<int:user_id>')
+
+@app.route('/chats')
 @login_required
-def chats(user_id):
+def chats():
     param = {}
     db_sess = db_session.create_session()
+    db_sess_cm = db_session_cm.create_session()
     if current_user.is_authenticated:
         param["user"] = current_user.user
         param["image"] = current_user.image
         param["now_id"] = current_user.id
-        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+        settings = db_sess.query(Settings).filter(
+            Settings.id == current_user.id).first()
     else:
         param["user"] = "Войдите в аккаунт"
         param["image"] = None
         param["now_id"] = ""
         settings = None
-    param["id"] = user_id 
-    profile_inf = db_sess.query(User).filter(User.id == user_id)
-    user = db_sess.query(User) 
-    chats =  db_sess.query(Chats).filter(Chats.id == user_id)
-    exist = profile_inf.first() is not None
-    return render_template('chats.html')
+    user = db_sess.query(User)
+    chats = db_sess_cm.query(Chats).filter(Chats.id == current_user.id).first()
+    return render_template('chats.html', title="Мессенджер", param=param, settings=settings, chats=chats, user=user)
 
-@app.route('/messenger:<int:user_id>') # мессенджер с кем-то. айдишка берется у них
+
+# мессенджер с кем-то. айдишка берется у них
+@app.route('/messenger:<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def messenger(user_id):
-    if curent_user.id != user_id:
-        db_sess = db_session.create_session()
-        other_user = db_sess.query(User).filter(User.id == user_id).first()
-        curent_user =  db_sess.query(User).filter(User.id == curent_user.id).first()
-        chat_name = 'to'.join(sorted([str(other_user), str(curent_user)]))
+    if current_user.id != user_id:
+        param = {}
         form = MessageForm()
+        db_sess = db_session.create_session()
+        db_sess_cm = db_session_cm.create_session()
+        param["user"] = current_user.user
+        param["image"] = current_user.image
+        param["now_id"] = current_user.id
+        settings = db_sess.query(Settings).filter(
+            Settings.id == current_user.id).first()
+        other_user = db_sess.query(User).filter(User.id == user_id).first()
+        chat_name = 'to'.join(sorted([str(user_id), str(current_user.id)]))
+        messages = db_sess_cm.query(Messenger).filter(
+            Messenger.from_to == chat_name)
+        embeds = db_sess_cm.query(MessengerEmbed).filter(
+            MessengerEmbed.from_to == chat_name)
         if form.validate_on_submit():
-            chat = Messenger()
-            chat.from_to = chat_name
-            chat.text = form.content
-            db_sess.add(chat)
-            db_sess.commit() # тут вроде гдето должен быть рендер темплейт но я не испытываю судьбу
-    return redirect(f'/chats:{curent_user}') # если пишет самому себе, то редректит просто на вкладку со всеми чатиками этого юзера
+            server = "https://violet-web.herokuapp.com"
+            print(post(f'{server}/api/message',
+                   json={'api_key': "XYGD6dX+$Zi1Tw2z",
+                         'content': form.content.data,
+                         'user_id': current_user.id,
+                         "chat_name": chat_name}).json())   
+        return render_template('messages.html', title="Чат", param=param, messages=messages,
+                               user=other_user, settings=settings, form=form, embeds=embeds)
+    # если пишет самому себе, то редректит просто на вкладку со всеми чатиками этого юзера
+    return redirect(f'/chats:{current_user.id}')

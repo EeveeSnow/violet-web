@@ -5,13 +5,15 @@ from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
 
 
-class NewsEmbed(SqlAlchemyBase):
-    __tablename__ = 'news_embed'
+class MessengerEmbed(SqlAlchemyBase):
+    __tablename__ = 'messenger_embed'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, 
                            primary_key=True, autoincrement=True)
 
+    from_to = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     # SOUNDCLOUD
+
     soundcloud_link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     soundcloud_song_title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
@@ -45,9 +47,3 @@ class NewsEmbed(SqlAlchemyBase):
     # YOUTUBE
 
     youtube_video = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-
-
-    
-
-
-

@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block user %}
+<link rel="stylesheet" type="text/css" href="/static/content/chats.css" />
+{% if current_user.is_authenticated %}
+<link rel="stylesheet" type="text/css" href="/static/content/themes/{{ settings.theme }}.css" />
+{% if param.image != None %}
+<img class="nav-profile-img" alt="profile-image" src="static/files/{{param.image}}">
+{% else %}
+<img class="nav-profile-img" alt="profile-image" src="static/images/person_default.png">
+{% endif %}
+<span class="link-text username-text">{{param.user}}</span>
+{% else %}
+<span class="link-text nousername-text">{{param.user}}</span>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="chats-template">
+    {% if chats != None %}
+    {% if chats.chats != None and chats.chats != "" %}
+    <h2>Чаты:</h2>
+    <div class="chats-block">
+        {% for item in chats.chats.split() %}
+        <div class="chats-card">
+            {% set user_id = item | int() %}
+            <a class="chats-card-links" href="/messenger:{{user_id }}">
+                {% if user[user_id - 1].image != None %}
+                <img class="chats-card-img" alt="profile-image" src="static/files/{{user[user_id - 1].image}}">
+                {% else %}
+                <img class="chats-card-img" alt="profile-image" src="static/images/person_default.png">
+                {% endif %}
+                <chats-card-name>{{ user[user_id - 1].user }}</chats-card-name>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endif %}
+{% endblock %}

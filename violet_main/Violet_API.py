@@ -1,22 +1,26 @@
 import base64
-from datetime import datetime
 import io
 import os
 import subprocess
+from datetime import datetime
+
 import flask
+from flask import jsonify, request
 from pytest import param
 from requests import get
-from flask import jsonify, request
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from violet_main.api.music_and_videos_api import get_soundcloud_id
-from violet_main.api.music_and_videos_api import get_yandexmusic_id
-from violet_main.api.music_and_videos_api import get_youtube_id
-from violet_main.data import db_session
+
+from violet_main.api.music_and_videos_api import (get_soundcloud_id,
+                                                  get_spotify_id,
+                                                  get_yandexmusic_id,
+                                                  get_youtube_id)
+from violet_main.data import db_session, db_session_cm
+from violet_main.data.messenger import Messenger
+from violet_main.data.messenger_embed import MessengerEmbed
 from violet_main.data.news import News
-from violet_main.data.users import User
 from violet_main.data.news_embed import NewsEmbed
-from violet_main.api.music_and_videos_api import get_spotify_id
+from violet_main.data.users import User
 
 app_api = "XYGD6dX+$Zi1Tw2z"
 api_route = flask.Blueprint(
@@ -135,5 +139,66 @@ def delete_news():
     if not news:
         return jsonify({'error': 'Not found'})
     db_sess.delete(news)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})
+
+@api_route.route('/api/message', methods=['POST'])
+def create_message():
+    db_sess = db_session_cm.create_session()
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ["api_key", 'content', 'user_id', 'chat_name']):
+        return jsonify({'error': 'Bad request'})
+    elif db_sess.query(User).filter(User.bot_id == request.json['api_key']).first() is not None or\
+        request.json['api_key'] != app_api:
+        return jsonify({'error': 'wrong api key'})
+    chat_text = request.json['content']
+    chat = Messenger()
+    chat.from_to = request.json["chat_name"]
+    chat.text = request.json["content"]
+    chat.sender = request.json["user_id"]
+    embed = MessengerEmbed()
+    embed.from_to = request.json["chat_name"]
+    if "https://open.spotify.com/" in chat_text:
+        has, out = get_spotify_id(chat_text)
+        if has["track"]:
+            embed.spotify_track = out["spotify_track"]
+            chat.embeds = True
+        if has['playlist']:
+            embed.spotify_playlist  = out["spotify_playlist"]
+            chat.embeds = True
+        if has['album']:
+            embed.spotify_album = out["spotify_album"]
+            chat.embeds = True
+    if "https://youtu.be/" in chat_text:
+        has, out = get_youtube_id(chat_text)
+        if has["youtube_video"]:
+            embed.youtube_video = out["youtube_video"]
+            chat.embeds = True
+    if "https://soundcloud.com/" in chat_text:
+        soundcloud_data, soundcloud_url = get_soundcloud_id(chat_text)
+        if soundcloud_data != None:
+            chat.embeds = True
+            embed.soundcloud_link = soundcloud_url
+            embed.soundcloud_song_author = soundcloud_data["author_name"]
+            embed.soundcloud_song_title = soundcloud_data["title"]
+            embed.soundcloud_song_img = soundcloud_data["thumbnail_url"]
+            embed.soundcloud_song_author_link = soundcloud_data["author_url"]
+            embed.soundcloud_html = soundcloud_data["html"]
+    if "https://music.yandex.ru/" in chat_text:
+        yandex_music_song_src, has = get_yandexmusic_id(chat_text)
+        if yandex_music_song_src != None:
+            if has["track"]:
+                embed.yandex_music_track = True
+            if has['playlist']:
+                embed.yandex_music_playlist  = True
+            if has['album']:
+                embed.yandex_music_album = True
+            chat.embeds = True
+            embed.yandex_music_song_src = yandex_music_song_src
+    db_sess.add(chat)
+    db_sess.commit()
+    db_sess.add(embed)
     db_sess.commit()
     return jsonify({'success': 'OK'})
