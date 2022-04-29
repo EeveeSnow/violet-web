@@ -38,61 +38,61 @@
         <div class="message-box">
             <div class="message-box-text"> {{ item.text }} </div>
             {% if item.embeds == True %}
-                {% if embeds.spotify_playlist != None %}
+                    {% if embeds[item.id - 1].spotify_playlist != None %}
                     <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/playlist/{{ embeds.spotify_playlist }}?utm_source=generator"
+                    src="https://open.spotify.com/embed/playlist/{{ embeds[item.id - 1].spotify_playlist }}?utm_source=generator"
                     width="90%" height="380" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
                     <br>
                     {% endif %}
-                    {% if embeds.spotify_album != None %}
+                    {% if embeds[item.id - 1].spotify_album != None %}
                     <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/album/{{ embeds.spotify_album }}?utm_source=generator" width="90%"
+                    src="https://open.spotify.com/embed/album/{{ embeds[item.id - 1].spotify_album }}?utm_source=generator" width="90%"
                     height="380" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
                     <br>
                     {% endif %}
-                    {% if embeds.spotify_track != None %}
+                    {% if embeds[item.id - 1].spotify_track != None %}
                     <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/track/{{ embeds.spotify_track }}?utm_source=generator" width="90%"
+                    src="https://open.spotify.com/embed/track/{{ embeds[item.id - 1].spotify_track }}?utm_source=generator" width="90%"
                     height="80" frameBorder="0" allowfullscreen=""
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
                     <br>
                     {% endif %}
-                    {% if embeds.soundcloud_html != None %}
+                    {% if embeds[item.id - 1].soundcloud_html != None %}
                         {% autoescape false %}
-                            {{ embeds.soundcloud_html}}
+                            {{ embeds[item.id - 1].soundcloud_html}}
                         {% endautoescape %}
                         <div
                             style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
-                            <a href="{{ embeds.soundcloud_song_author_link }}" title="{{ embeds.soundcloud_song_author }}" target="_blank"
-                            style="color: #cccccc; text-decoration: none;">{{ embeds.soundcloud_song_author }}</a> · <a
-                            href="{{ embeds.soundcloud_link}}"
+                            <a href="{{ embeds[item.id - 1].soundcloud_song_author_link }}" title="{{ embeds[item.id - 1].soundcloud_song_author }}" target="_blank"
+                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_author }}</a> · <a
+                            href="{{ embeds[item.id - 1].soundcloud_link}}"
                             title="{{ embeds[item.id -1].soundcloud_song_title }}" target="_blank"
-                            style="color: #cccccc; text-decoration: none;">{{ embeds.soundcloud_song_title }}</a></div>
+                            style="color: #cccccc; text-decoration: none;">{{ embeds[item.id - 1].soundcloud_song_title }}</a></div>
                     {% endif %}
-                    {% if embeds.yandex_music_song_src != None %}
-                        {% if embeds.yandex_music_track == True %}
+                    {% if embeds[item.id - 1].yandex_music_song_src != None %}
+                        {% if embeds[item.id - 1].yandex_music_track == True %}
                         <iframe frameborder="0" style="border:none;width:90%;height:180px;" width="90%" height="180"
-                        src="https://music.yandex.ru/iframe/#track/{{ embeds.yandex_music_song_src }}"></iframe>
+                        src="https://music.yandex.ru/iframe/#track/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
                         {% endif %}
-                        {% if embeds.yandex_music_album == True %}
+                        {% if embeds[item.id - 1].yandex_music_album == True %}
                         <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
-                         src="https://music.yandex.ru/iframe/#album/{{ embeds.yandex_music_song_src }}"></iframe>
+                         src="https://music.yandex.ru/iframe/#album/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
                         {% endif %}
-                        {% if embeds.yandex_music_playlist == True %}
+                        {% if embeds[item.id - 1].yandex_music_playlist == True %}
                         <iframe frameborder="0" style="border:none;width:90%;height:380px;" width="90%" height="380"
-                         src="https://music.yandex.ru/iframe/#playlist/music-blog/{{ embeds.yandex_music_song_src }}"></iframe>
+                         src="https://music.yandex.ru/iframe/#playlist/music-blog/{{ embeds[item.id - 1].yandex_music_song_src }}"></iframe>
                         {% endif %}
                     {% endif %}
-                    {% if embeds.youtube_video != None %}
+                    {% if embeds[item.id - 1].youtube_video != None %}
                         <iframe width="90%" height="315"
-                        src="https://www.youtube-nocookie.com/embed/{{ embeds.youtube_video }}?controls=0"
+                        src="https://www.youtube-nocookie.com/embed/{{ embeds[item.id - 1].youtube_video }}?controls=0"
                         title="YouTube video player" frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen></iframe>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
         </div>
         </div>
 
