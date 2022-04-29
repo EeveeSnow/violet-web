@@ -144,7 +144,8 @@ def delete_news():
 
 @api_route.route('/api/message', methods=['POST'])
 def create_message():
-    db_sess = db_session_cm.create_session()
+    db_sess_cm = db_session_cm.create_session()
+    db_sess = db_session.create_session()
     if not request.json:
         return jsonify({'error': 'Empty request'})
     elif not all(key in request.json for key in
@@ -197,8 +198,7 @@ def create_message():
                 embed.yandex_music_album = True
             chat.embeds = True
             embed.yandex_music_song_src = yandex_music_song_src
-    db_sess.add(chat)
-    db_sess.commit()
-    db_sess.add(embed)
-    db_sess.commit()
+    db_sess_cm.add(chat)
+    db_sess_cm.add(embed)
+    db_sess_cm.commit()
     return jsonify({'success': 'OK'})
