@@ -617,7 +617,7 @@ def messenger(user_id):
         messages = db_sess_cm.query(Messenger).filter(
             Messenger.from_to == chat_name)
         embeds = db_sess_cm.query(MessengerEmbed).filter(
-            MessengerEmbed.from_to == chat_name)
+            MessengerEmbed.from_to == chat_name).first()
         if form.validate_on_submit():
             server = "https://violet-web.herokuapp.com"
             print(post(f'{server}/api/message',
