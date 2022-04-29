@@ -21,6 +21,7 @@ from violet_main.data.friends import Friends
 from violet_main.forms.SearchForm import SearchForm
 from violet_main.wsgi import app
 from violet_main.data import db_session
+from violet_main.data import db_session_cm
 from violet_main.data.news import News
 from violet_main.data.news_comments import NewsComments
 from violet_main.data.news_embed import NewsEmbed
@@ -30,9 +31,13 @@ from violet_main.forms.LoginForm import LoginForm
 from violet_main.forms.NewsForm import NewsForm
 from violet_main.forms.PhotoForm import UploadForm, UploadForm2
 from violet_main.forms.RegisterForm import RegisterForm
+from violet_main.forms.MessageForm import MessageForm
+from violet_main.data.chats import Chats
+from violet_main.data.messenger import Messenger
 
 
 db_session.global_init("violet_main/db/data.db")
+db_session_cm.global_init("violet_main/db/messenger.db")
 login_manager = LoginManager()
 login_manager.init_app(app)
 UPLOAD_PATH = "server/images"
@@ -479,3 +484,63 @@ def bot_info():
     db_sess = db_session.create_session()
     profile =  db_sess.query(User).filter(User.id == current_user.id).first()
     return render_template('bot-info.html', item=profile)
+
+@app.route('/start_chat:<int:user_id>') # хотелка начать с кемто чатик
+@login_required
+def start_chat(user_id):
+    if current_user.id != user_id:
+        db_sess = db_session.create_session()
+        other_user = db_sess.query(Chats).filter(Chats.id == user_id).first()
+        curent_user =  db_sess.query(Chats).filter(Chats.id == current_user.id).first()
+        if str(user_id) not in curent_user.chats:
+            if other_user.chats != None:
+                other_user.chats = other_user.chats + " " + str(current_user.id)
+            else:
+                other_user.chats = str(current_user.id)
+            if curent_user.chats != None:
+                curent_user.chats = curent_user.chats + " " + str(user_id)
+            else:
+                curent_user.chats = str(user_id)
+        else:
+            return redirect(f'/messenger:<int:user_id>') # чатик уже есть > перенаправляет на него
+        db_sess.commit() 
+    return redirect(f'/user_id:{user_id}')
+
+@app.route('/chats:<int:user_id>')
+@login_required
+def chats(user_id):
+    param = {}
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
+        param["user"] = current_user.user
+        param["image"] = current_user.image
+        param["now_id"] = current_user.id
+        settings = db_sess.query(Settings).filter(Settings.id == current_user.id).first()
+    else:
+        param["user"] = "Войдите в аккаунт"
+        param["image"] = None
+        param["now_id"] = ""
+        settings = None
+    param["id"] = user_id 
+    profile_inf = db_sess.query(User).filter(User.id == user_id)
+    user = db_sess.query(User) 
+    chats =  db_sess.query(Chats).filter(Chats.id == user_id)
+    exist = profile_inf.first() is not None
+    return render_template('chats.html')
+
+@app.route('/messenger:<int:user_id>') # мессенджер с кем-то. айдишка берется у них
+@login_required
+def messenger(user_id):
+    if curent_user.id != user_id:
+        db_sess = db_session.create_session()
+        other_user = db_sess.query(User).filter(User.id == user_id).first()
+        curent_user =  db_sess.query(User).filter(User.id == curent_user.id).first()
+        chat_name = 'to'.join(sorted([str(other_user), str(curent_user)]))
+        form = MessageForm()
+        if form.validate_on_submit():
+            chat = Messenger()
+            chat.from_to = chat_name
+            chat.text = form.content
+            db_sess.add(chat)
+            db_sess.commit() # тут вроде гдето должен быть рендер темплейт но я не испытываю судьбу
+    return redirect(f'/chats:{curent_user}') # если пишет самому себе, то редректит просто на вкладку со всеми чатиками этого юзера
